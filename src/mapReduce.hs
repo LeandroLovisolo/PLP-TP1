@@ -8,7 +8,7 @@ type Dict k v = [(k,v)]
 
 -- Ejercicio 1
 belongs :: Eq k => k -> Dict k v -> Bool
-belongs key = foldr (\(k,v) rec -> (rec || k==key)) False
+belongs key = any (\x -> (fst x)==key)
 
 (?) :: Eq k => Dict k v -> k -> Bool
 (?) = flip belongs
@@ -17,16 +17,18 @@ belongs key = foldr (\(k,v) rec -> (rec || k==key)) False
 
 -- Ejercicio 2
 get :: Eq k => k -> Dict k v -> v
-get = undefined
+get key dict = snd (foldr1 (\e (k,v) -> (if k==key then (k,v) else e)) dict)
 
 (!) :: Eq k => Dict k v -> k -> v
-(!) = undefined
+(!) = flip get
 --Main> [("calle",[3]),("city",[2,1])] ! "city" 
 --[2,1]
 
 -- Ejercicio 3
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
-insertWith = undefined
+insertWith f key val dict = if (dict ? key)
+                            then map (\(k,v) -> (if k==key then (k,(f v val)) else (k,v))) dict
+                            else dict++[(key,val)]
 --Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
 --[(1,"lab"),(2,"p")]
 
