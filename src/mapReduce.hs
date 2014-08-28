@@ -34,7 +34,7 @@ insertWith f key val dict = if (dict ? key)
 
 -- Ejercicio 4
 groupByKey :: Eq k => [(k,v)] -> Dict k [v]
-groupByKey = undefined
+groupByKey dict = foldr (uncurry (insertWith (flip (++)))) [] (map (\(k,v) -> (k,[v])) dict)
 
 -- Ejercicio 5
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
