@@ -50,7 +50,7 @@ type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
 distributionProcess :: Int -> [a] -> [[a]]
-distributionProcess = undefined
+distributionProcess n = undefined
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
@@ -62,7 +62,7 @@ combinerProcess = undefined
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
-reducerProcess = undefined
+reducerProcess red lst = foldr (\x xs -> (red x) ++ xs) [] lst
 
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
