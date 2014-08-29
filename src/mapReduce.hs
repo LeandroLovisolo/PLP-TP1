@@ -62,7 +62,7 @@ combinerProcess = undefined
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
-reducerProcess red lst = foldr (\x xs -> (red x) ++ xs) [] lst
+reducerProcess red = foldr (\x xs -> (red x) ++ xs) []
 
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
