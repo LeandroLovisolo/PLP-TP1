@@ -54,7 +54,7 @@ distributionProcess n = undefined
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
-mapperProcess f = groupByKey (foldr (\x rec -> (f x) ++ rec) [])
+mapperProcess f lst = groupByKey (foldr (\x rec -> (f x) ++ rec) [] lst)
 --mapperProcess (\x -> if x % 2 == 0 then 1 else 2) [1,2,3,4,5,6]
 
 -- Ejercicio 8
