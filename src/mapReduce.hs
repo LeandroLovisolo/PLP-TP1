@@ -54,7 +54,8 @@ distributionProcess n = undefined
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
-mapperProcess = undefined
+mapperProcess f = groupByKey (foldr (\x rec -> (f x) ++ rec) [])
+--mapperProcess (\x -> if x % 2 == 0 then 1 else 2) [1,2,3,4,5,6]
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
@@ -62,7 +63,7 @@ combinerProcess = undefined
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
-reducerProcess red = foldr (\x xs -> (red x) ++ xs) []
+reducerProcess red = foldr (\x rec -> (red x) ++ rec) []
 
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
