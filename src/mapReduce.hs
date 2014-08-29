@@ -50,7 +50,8 @@ type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
 distributionProcess :: Int -> [a] -> [[a]]
-distributionProcess n = undefined
+distributionProcess n lst = map (\x -> snd x) (groupByKey (map (\x -> (mod (snd x) n, fst x) ) (zip lst [0..((length lst)-1)])))
+-- distributionProcess 3 [1,2,3,4,5,6,7,8,9,10]
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
@@ -68,7 +69,8 @@ reducerProcess red = foldr (\x rec -> (red x) ++ rec) []
 
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
-mapReduce = undefined
+mapReduce f g lst = reducerProcess g (combinerProcess (map (mapperProcess f) (distributionProcess 100 lst)))
+-- Necesita testing!
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
