@@ -38,7 +38,7 @@ groupByKey dict = foldr (uncurry (insertWith (flip (++)))) [] (map (\(k,v) -> (k
 
 -- Ejercicio 5
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
-unionWith = undefined
+unionWith f dict1 = foldr (uncurry (insertWith f)) dict1
 --Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
 --[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
 
