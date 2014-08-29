@@ -59,7 +59,8 @@ mapperProcess f lst = groupByKey (foldr (\x rec -> (f x) ++ rec) [] lst)
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
-combinerProcess = undefined
+combinerProcess lst = sortBy (\x y -> if (fst x) >= (fst y) then GT else LT) (foldr (\x rec -> unionWith (++) x rec) [] lst)
+-- Necesita testing, unionWith no implementada todavía
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
