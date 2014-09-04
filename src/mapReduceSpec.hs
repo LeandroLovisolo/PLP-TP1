@@ -14,6 +14,14 @@ main = hspec $ do
       belongs "k" []                              `shouldBe` False
       [("H", [1]), ("E", [2]), ("Y", [0])] ? "R"  `shouldBe` False
       [("V", [1]), ("O", [2]), ("S", [0])] ? "V"  `shouldBe` True
+      [("k", [1])] ? "k"                          `shouldBe` True
+      [("t", [1])] ? "k"                          `shouldBe` False
+
+    it "puede obtenerse el valor correspondiente a una determinada clave" $ do
+      get "k" [("k", "valor")]                    `shouldBe` "valor"
+      [(1, [1, 2, 3]), (2, [1, 2]), (3, [])] ! 1  `shouldBe` [1, 2, 3]
+      [(9000, "A"), (2, "B"), (0, "C")] ! 2       `shouldBe` "B"
+      [(1, "valor1"), (0, "valor2"), (42, "valor3"), (3, "valor4")] ! 3 `shouldBe` "valor4"
 
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
