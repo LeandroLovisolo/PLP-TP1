@@ -78,7 +78,12 @@ mapReduce f g lst = reducerProcess g (combinerProcess (map (mapperProcess f) (di
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
-visitasPorMonumento = undefined
+visitasPorMonumento = mapReduce mapper reducer
+  where mapper k = [(k, 1)]
+        reducer (k, vs) = [(k, sum vs)]
+
+-- *MapReduce> visitasPorMonumento ["m1", "m2", "m3", "m2"]
+-- [("m1",1),("m2",2),("m3",1)]
 
 -- Ejercicio 12
 monumentosTop :: [String] -> [String]
