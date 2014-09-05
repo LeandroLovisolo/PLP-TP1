@@ -48,11 +48,15 @@ unionWith f dict1 = foldr (uncurry (insertWith f)) dict1
 type Mapper a k v = a -> [(k,v)]
 type Reducer k v b = (k, [v]) -> [b]
 
+rotate :: Int -> [a] -> [a]
+rotate _ [] = []
+rotate n xs = zipWith const (drop n (cycle xs)) xs
+
 -- Ejercicio 6
 distributionProcess :: Int -> [a] -> [[a]]
-distributionProcess n lst = map (\x -> snd x) (groupByKey (map (\x -> (mod (snd x) n, fst x) ) (zip lst [0..((length lst)-1)])))
+distributionProcess n lst = reverse (foldr (\x rec -> rotate 1 ((x : head (rec)) : tail(rec))) (replicate n []) lst)
 -- distributionProcess 3 [1,2,3,4,5,6,7,8,9,10]
--- Que pasa si pido mas computadoras que el largo de la lista? Respetaria el enunciado?
+
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]

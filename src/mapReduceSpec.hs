@@ -34,6 +34,7 @@ main = hspec $ do
       distributionProcess 4 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1,5,9],[2,6,10],[3,7],[4,8]]
       distributionProcess 1 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1,2,3,4,5,6,7,8,9,10]]
       distributionProcess 10 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]]
+      distributionProcess 12 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[],[]]
     it "Mapper process funciona correctamente" $do
       (mapperProcess (\x -> if (mod x 2) == 0 then [("esPar",x)] else [("esImpar",x)]) [1,2,3,4,5,6]) 
         `shouldMatchList` [("esPar",[2,4,6]),("esImpar",[1,3,5])]
