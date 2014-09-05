@@ -1,0 +1,10 @@
+# Haskell
+*.o
+*.hi
+
+# Binaries
+testTP1
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
