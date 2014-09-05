@@ -52,11 +52,11 @@ type Reducer k v b = (k, [v]) -> [b]
 distributionProcess :: Int -> [a] -> [[a]]
 distributionProcess n lst = map (\x -> snd x) (groupByKey (map (\x -> (mod (snd x) n, fst x) ) (zip lst [0..((length lst)-1)])))
 -- distributionProcess 3 [1,2,3,4,5,6,7,8,9,10]
+-- Que pasa si pido mas computadoras que el largo de la lista? Respetaria el enunciado?
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
 mapperProcess f lst = groupByKey (foldr (\x rec -> (f x) ++ rec) [] lst)
---mapperProcess (\x -> if x % 2 == 0 then 1 else 2) [1,2,3,4,5,6]
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
