@@ -92,6 +92,7 @@ main = hspec $ do
       -- m > 1, n > 1, con claves repetidas
       unionWith (+) [("a", 1), ("b", 2)] [("a", 3), ("c", 4)] `shouldMatchList` [("a", 4), ("b", 2), ("c", 4)]
 
+  describe "MapReduce" $ do
     it "[Ej. 6] Se puede distribuir una lista de manera balanceada" $ do
       -- m := longitud de la lista original, n := cantidad de máquinas
       -- m = 0, n = 1
@@ -152,13 +153,16 @@ main = hspec $ do
       -- n > 1, m_i > 1 para algún i
       reducerProcess reducer [("a", [1..3]), ("b", [4..6]), ("c", [7..9])] `shouldBe` [6, 15, 24, 48]
 
-  describe "MapReduce" $ do
-    it "visitas por monumento funciona en algún orden" $ do
-      visitasPorMonumento ["m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
+  describe "Utilización" $ do
+    it "[Ej. 11] visitasPorMonumento computa correctamente el número de visitas de cada monumento" $ do
+      visitasPorMonumento ["m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3", 3), ("m1", 2), ("m2", 2)] 
 
-    it "monumentosTop devuelve los más visitados en algún orden" $ do 
+    it "[Ej. 12] monumentosTop devuelve los monumentos más visitados en algún orden válido" $ do 
       monumentosTop ["m1", "m0", "m0", "m0", "m2", "m2", "m3"] `shouldBeOneOf` [["m0", "m2", "m3", "m1"],
                                                                                 ["m0", "m2", "m1", "m3"]]
+
+    it "[Ej. 13] monumentosPorPais computa correctamente las cantidades esperadas" $ do
+       monumentosPorPais items `shouldMatchList` [("Argentina", 2), ("Irak", 1)]
 
 -- Función auxiliar para testear distributionProcess (ejercicio 6)
 correctlyDistributed :: Eq a => Int -> [a] -> [[a]] -> Bool
