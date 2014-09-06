@@ -9,6 +9,7 @@ main :: IO ()
 main = hspec $ do
   describe "Utilizando Diccionarios" $ do
     it "[Ej. 1] Puede decidirse si un diccionario tiene cierta clave" $ do
+      -- Versión prefija
       -- Caso base
       belongs "a" []                   `shouldBe` False
       -- Caso n = 1
@@ -18,6 +19,7 @@ main = hspec $ do
       belongs "a" [("b", 1), ("c", 2)] `shouldBe` False
       belongs "a" [("a", 1), ("b", 2)] `shouldBe` True
 
+      -- Versión infija
       -- Caso base
       [] ? "a"                         `shouldBe` False
       -- Caso n = 1
@@ -28,12 +30,14 @@ main = hspec $ do
       [("a", 1), ("b", 2)] ? "a"       `shouldBe` True
 
     it "[Ej. 2] Puede extraerse una definición en un diccionario dada su clave" $ do
+      -- Versión prefija
       -- Caso n = 1
       get "a" [("a", 1)]           `shouldBe` 1
       -- Caso n > 1
       get "a" [("a", 1), ("b", 2)] `shouldBe` 1
       get "b" [("a", 1), ("b", 2)] `shouldBe` 2
 
+      -- Versión infija
       -- Caso n = 1
       [("a", 1)] ! "a"             `shouldBe` 1
       -- Caso n > 1
