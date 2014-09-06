@@ -1,6 +1,5 @@
---  Para correr los tests deben cargar en hugs el módulo Tests
---  y evaluar la expresión "main".
--- Algunas funciones que pueden utilizar para chequear resultados:
+-- Para correr los tests deben cargar en hugs el módulo Tests y evaluar la
+-- expresión "main". Algunas funciones que pueden utilizar para chequear resultados:
 -- http://hackage.haskell.org/package/hspec-expectations-0.6.1/docs/Test-Hspec-Expectations.html#t:Expectation
 
 import Test.Hspec
@@ -9,13 +8,24 @@ import MapReduce
 main :: IO ()
 main = hspec $ do
   describe "Utilizando Diccionarios" $ do
-    it "puede determinarse si un elemento es una clave o no" $ do
-      belongs 3 [(3, "A"), (0, "R"), (7, "G")]    `shouldBe` True
-      belongs "k" []                              `shouldBe` False
-      [("H", [1]), ("E", [2]), ("Y", [0])] ? "R"  `shouldBe` False
-      [("V", [1]), ("O", [2]), ("S", [0])] ? "V"  `shouldBe` True
-      [("k", [1])] ? "k"                          `shouldBe` True
-      [("t", [1])] ? "k"                          `shouldBe` False
+    it "[Ej. 1] Puede decidirse si un diccionario tiene cierta clave" $ do
+      -- Caso base
+      belongs "a" []                   `shouldBe` False
+      -- Caso n = 1
+      belongs "a" [("b", 1)]           `shouldBe` False
+      belongs "a" [("a", 1)]           `shouldBe` True
+      -- Caso n > 1
+      belongs "a" [("b", 1), ("c", 2)] `shouldBe` False
+      belongs "a" [("a", 1), ("b", 2)] `shouldBe` True
+
+      -- Caso base
+      [] ? "a"                         `shouldBe` False
+      -- Caso n = 1
+      [("b", 1)] ? "a"                 `shouldBe` False
+      [("a", 1)] ? "a"                 `shouldBe` True
+      -- Caso n > 1
+      [("b", 1), ("c", 2)] ? "a"       `shouldBe` False
+      [("a", 1), ("b", 2)] ? "a"       `shouldBe` True
 
     it "puede obtenerse el valor correspondiente a una determinada clave" $ do
       get "k" [("k", "valor")]                    `shouldBe` "valor"
