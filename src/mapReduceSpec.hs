@@ -11,68 +11,69 @@ main :: IO ()
 main = hspec $ do
   describe "Utilizando Diccionarios" $ do
     it "[Ej. 1] Puede decidirse si un diccionario tiene cierta clave" $ do
-      -- Versión prefija
-      -- Caso base
+      -- n := tamaño del diccionario
+      -- n = 0, versión prefija
       belongs "a" []                   `shouldBe` False
-      -- Caso n = 1
+      -- n = 1, versión prefija
       belongs "a" [("b", 1)]           `shouldBe` False
       belongs "a" [("a", 1)]           `shouldBe` True
-      -- Caso n > 1
+      -- n > 1, versión prefija
       belongs "a" [("b", 1), ("c", 2)] `shouldBe` False
       belongs "a" [("a", 1), ("b", 2)] `shouldBe` True
-
-      -- Versión infija
-      -- Caso base
+      -- n = 0, versión infija
       [] ? "a"                         `shouldBe` False
-      -- Caso n = 1
+      -- n = 1, versión infija
       [("b", 1)] ? "a"                 `shouldBe` False
       [("a", 1)] ? "a"                 `shouldBe` True
-      -- Caso n > 1
+      -- n > 1, versión infija
       [("b", 1), ("c", 2)] ? "a"       `shouldBe` False
       [("a", 1), ("b", 2)] ? "a"       `shouldBe` True
 
     it "[Ej. 2] Puede extraerse una definición en un diccionario dada su clave" $ do
-      -- Versión prefija
-      -- Caso n = 1
+      -- n := tamaño del diccionario
+      -- n = 1, versión prefija
       get "a" [("a", 1)]           `shouldBe` 1
-      -- Caso n > 1
+      -- n > 1, versión prefija
       get "a" [("a", 1), ("b", 2)] `shouldBe` 1
       get "b" [("a", 1), ("b", 2)] `shouldBe` 2
-
-      -- Versión infija
-      -- Caso n = 1
+      -- n = 1, versión infija
       [("a", 1)] ! "a"             `shouldBe` 1
-      -- Caso n > 1
+      -- n > 1, versión infija
       [("a", 1), ("b", 2)] ! "a"   `shouldBe` 1
       [("a", 1), ("b", 2)] ! "b"   `shouldBe` 2
 
     it "[Ej. 3] Puede reemplazarse una definición en un diccionario dada su clave" $ do
-      -- Caso base
+      -- n := tamaño del diccionario
+      -- n = 0
       insertWith (++) "a" [1] []                        `shouldBe`        [("a", [1])]
-      -- Caso n = 1, clave inexistente
+      -- n = 1, clave inexistente
       insertWith (++) "a" [1] [("b", [2])]              `shouldMatchList` [("a", [1]), ("b", [2])]
-      -- Caso n = 1, clave existente
+      -- n = 1, clave existente
       insertWith (++) "a" [2] [("a", [1])]              `shouldBe`        [("a", [1, 2])]
-      -- Caso n > 1, clave inexistente
+      -- n > 1, clave inexistente
       insertWith (++) "a" [1] [("b", [2]), ("c", [3])]  `shouldMatchList` [("a", [1]), ("b", [2]), ("c", [3])]
-      -- Caso n > 1, clave existente
+      -- n > 1, clave existente
       insertWith (++) "a" [10] [("a", [1]), ("b", [2])] `shouldMatchList` [("a", [1, 10]), ("b", [2])]
 
     it "[Ej. 4] Puede agruparse una lista de tuplas (k, v) como diccionario Dict k [v]" $ do
-      -- Caso base
+      -- n := tamaño del diccionario
+      -- n = 0
       groupByKey ([] :: [(String, Int)])        `shouldMatchList`  []
-      -- Caso n = 1
+      -- n = 1
       groupByKey [("a", 1)]                     `shouldBe`         [("a", [1])]
-      -- Caso n > 1, sin claves repetidas
+      -- n > 1, sin claves repetidas
       groupByKey [("a", 1), ("b", 2)]           `shouldMatchList`  [("a", [1]), ("b", [2])]
-      -- Caso n > 1, con claves repetidas
+      -- n > 1, con claves repetidas
       groupByKey [("a", 1), ("a", 2), ("b", 3)] `shouldMatchOneOf` [[("a", [1, 2]), ("b", [3])],
                                                                     [("a", [2, 1]), ("b", [3])]]
 
     it "[Ej. 5] Pueden unirse diccionarios agrupando por clave en caso de conflicto" $ do
-      -- Casos base
+      -- m := tamaño del primer diccionario, n := tamaño del segundo diccionario
+      -- m = n = 0
       unionWith (+) [] []                                     `shouldBe`        ([] :: [(String, Int)])
+      -- m = 1, n = 0
       unionWith (+) [("a", 1)] []                             `shouldBe`        [("a", 1)]
+      -- m = 0, n = 1
       unionWith (+) [] [("a", 1)]                             `shouldBe`        [("a", 1)]
       -- m = n = 1, sin claves repetidas
       unionWith (+) [("a", 1)] [("b", 2)]                     `shouldMatchList` [("a", 1), ("b", 2)]
@@ -92,7 +93,7 @@ main = hspec $ do
       unionWith (+) [("a", 1), ("b", 2)] [("a", 3), ("c", 4)] `shouldMatchList` [("a", 4), ("b", 2), ("c", 4)]
 
     it "[Ej. 6] Se puede distribuir una lista de manera balanceada" $ do
-      -- m = tamaño de la lista original, n = cantidad de máquinas
+      -- m := longitud de la lista original, n := cantidad de máquinas
       -- m = 0, n = 1
       let n = 1; xs = ([] :: [Int]) in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
       -- m = 1, n = 1
@@ -107,7 +108,8 @@ main = hspec $ do
       let n = 11; xs = [1..10]      in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
 
     it "[Ej. 7] Se puede aplicar una función mapper a los elementos de una lista" $ do
-      -- Caso base
+      -- n := longitud de la lista
+      -- n = 0
       mapperProcess mapper []        `shouldBe` []
       -- n = 1, un único par (clave, definición) por item
       mapperProcess mapper [1]       `shouldBe` [("a", [1])]
@@ -119,8 +121,8 @@ main = hspec $ do
       mapperProcess mapper [1..5]    `shouldMatchList` [("a", [1, 1, 1, 1, 1]), ("b", [1, 1])]
 
     it "[Ej. 8] Se pueden agrupar y ordenar por clave las salidas de varios mappers" $ do
-      -- n = número de mappers usados, m_i = longitud de la salida del i-ésimo mapper
-      -- Caso base
+      -- n := número de mappers usados, m_i := longitud de la salida del i-ésimo mapper
+      -- n = 0
       combinerProcess []                                         `shouldBe`      ([] :: [(String, [Int])])
       -- n = 1, m_1 = 1
       combinerProcess [[("a", [1])]]                             `shouldBe`      [("a", [1])]
@@ -138,7 +140,7 @@ main = hspec $ do
                                                                                   [("a", [2, 1]), ("b", [3])]]
 
     it "[Ej. 9] Se puede reducir el resultado de combinar la salida de varios mappers" $ do
-      -- n = número de pares a reducir, m_i = longitud de la reducción del i-ésimo par
+      -- n := número de pares a reducir, m_i := longitud de la reducción del i-ésimo par
       -- n = 0
       reducerProcess reducer []                                            `shouldBe` []
       -- n = 1, m_1 = 1
