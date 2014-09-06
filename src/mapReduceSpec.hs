@@ -92,7 +92,7 @@ main = hspec $ do
       unionWith (+) [("a", 1), ("b", 2)] [("a", 3), ("c", 4)] `shouldMatchList` [("a", 4), ("b", 2), ("c", 4)]
 
     it "[Ej. 6] Se puede distribuir una lista de manera balanceada" $ do
-      -- m = tamaño de la lista original, n = cantidad de maquinas
+      -- m = tamaño de la lista original, n = cantidad de máquinas
       -- m = 0, n = 1
       let n = 1; xs = ([] :: [Int]) in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
       -- m = 1, n = 1
@@ -137,6 +137,19 @@ main = hspec $ do
       combinerProcess [[("b", [3]), ("a", [1])], [("a", [2])]]   `shouldBeOneOf` [[("a", [1, 2]), ("b", [3])],
                                                                                   [("a", [2, 1]), ("b", [3])]]
 
+    it "[Ej. 9] Se puede reducir el resultado de combinar la salida de varios mappers" $ do
+      -- n = número de pares a reducir, m_i = longitud de la reducción del i-ésimo par
+      -- n = 0
+      reducerProcess reducer []                                            `shouldBe` []
+      -- n = 1, m_1 = 1
+      reducerProcess reducer [("a", [1..3])]                               `shouldBe` [6]
+      -- n = 1, m_1 > 1
+      reducerProcess reducer [("c", [1..3])]                               `shouldBe` [6, 12]
+      -- n > 1, m_i = 1 para todo i
+      reducerProcess reducer [("a", [1..3]), ("b", [4..6])]                `shouldBe` [6, 15]
+      -- n > 1, m_i > 1 para algún i
+      reducerProcess reducer [("a", [1..3]), ("b", [4..6]), ("c", [7..9])] `shouldBe` [6, 15, 24, 48]
+
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
       visitasPorMonumento [ "m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
@@ -169,6 +182,11 @@ mapper :: Mapper Int String Int
 mapper x | x `mod` 2 == 0 = [("a", 1), ("b", 1)]
          | otherwise      = [("a", 1)]
 
+-- Reducer auxiliar para testear reducerProcess (ejercicio 9)
+reducer :: Reducer String Int Int
+reducer (k, vs) | k == "a" || k == "b" = [sum vs]
+                | otherwise            = [sum vs, 2 * (sum vs)]
+
 -- Devuelve true si y sólo si ambas listas tienen los mismos elementos
 sameItems :: Eq a => [a] -> [a] -> Bool
 sameItems xs ys = null (xs \\ ys) && null (ys \\ xs)
@@ -177,6 +195,6 @@ sameItems xs ys = null (xs \\ ys) && null (ys \\ xs)
 shouldBeOneOf :: (Show a, Eq a) => a -> [a] -> Expectation
 actual `shouldBeOneOf` xs = assertBool ("predicate failed on: " ++ show actual) $ actual `elem` xs
 
--- Verifica que la lista tenga los mismos elementos que algunas de las listas provistas
+-- Verifica que la lista tenga los mismos elementos que alguna de las listas provistas
 shouldMatchOneOf :: (Show a, Eq a) => [a] -> [[a]] -> Expectation
 x `shouldMatchOneOf` ys = assertBool ("predicate failed on: " ++ show x) $ any (sameItems x) ys
