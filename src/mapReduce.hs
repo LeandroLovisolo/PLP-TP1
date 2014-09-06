@@ -87,7 +87,12 @@ visitasPorMonumento = mapReduce mapper reducer
 
 -- Ejercicio 12
 monumentosTop :: [String] -> [String]
-monumentosTop = undefined
+monumentosTop = (mapReduce mapper reducer) . visitasPorMonumento
+  where mapper (k, v) = [(-v, k)]
+        reducer (k, vs) = vs 
+
+-- *MapReduce> monumentosTop ["m1", "m2", "m3", "m2", "m3", "m3", "m1", "m4"]
+-- ["m3","m1","m2","m4"]
 
 -- Ejercicio 13 
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
