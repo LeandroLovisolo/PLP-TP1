@@ -104,6 +104,18 @@ main = hspec $ do
       -- 1 < m < n, n > 1
       let n = 11; xs = [1..10]      in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
 
+    it "[Ej. 7] Se puede aplicar una función mapper a los elementos de una lista" $ do
+      -- Caso base
+      mapperProcess mapper []        `shouldBe` []
+      -- n = 1, un único par (clave, definición) por item
+      mapperProcess mapper [1]       `shouldBe` [("a", [1])]
+      -- n = 1, múltiples pares (clave, definición) por item
+      mapperProcess mapper [2]       `shouldMatchList` [("a", [1]), ("b", [1])]
+      -- n > 1, un único par (clave, definición) por item
+      mapperProcess mapper [1, 3, 5] `shouldBe` [("a", [1, 1, 1])]
+      -- n > 1, múltiples pares (clave, definición) por item
+      mapperProcess mapper [1..5]    `shouldMatchList` [("a", [1, 1, 1, 1, 1]), ("b", [1, 1])]
+
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
       visitasPorMonumento [ "m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
@@ -131,3 +143,8 @@ correctlyDistributed n xs res = sameItems && correctlyPartitioned
   where sameItems             = null (xs \\ concat res) && null ((concat res) \\ xs)
         correctlyPartitioned  = sort (map length res) == sort correctPartitionSizes
         correctPartitionSizes = [length xs `div` n + (if x < length xs `mod` n then 1 else 0) | x <- [0..n-1]]
+
+-- Mapper auxiliar para testear mapperProcess (ejercicio 7)
+mapper :: Mapper Int String Int
+mapper x | x `mod` 2 == 0 = [("a", 1), ("b", 1)]
+         | otherwise      = [("a", 1)]
