@@ -4,6 +4,7 @@
 
 # Binaries
 testTP1
+tests
 
 # Sublime Text
 *.sublime-project
