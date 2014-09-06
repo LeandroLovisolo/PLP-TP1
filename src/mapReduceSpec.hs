@@ -58,6 +58,16 @@ main = hspec $ do
       insertWith (++) "a" [10] [("a", [1]), ("b", [2])]
         `shouldMatchList` [("a", [1, 10]), ("b", [2])]
 
+    it "[Ej. 4] Puede agruparse una lista de tuplas (k, v) como diccionario Dict k [v]" $ do
+      -- Caso base
+      groupByKey ([] :: [(String, Int)])        `shouldMatchList` []
+      -- Caso n = 1
+      groupByKey [("a", 1)]                     `shouldBe` [("a", [1])]
+      -- Caso n > 1, sin claves repetidas
+      groupByKey [("a", 1), ("b", 2)]           `shouldMatchList` [("a", [1]), ("b", [2])]
+      -- Caso n > 1, con claves repetidas
+      groupByKey [("a", 1), ("a", 2), ("b", 3)] `shouldMatchList` [("a", [1, 2]), ("b", [3])]
+
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
       visitasPorMonumento [ "m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
