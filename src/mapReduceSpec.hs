@@ -9,7 +9,7 @@ import MapReduce
 
 main :: IO ()
 main = hspec $ do
-  describe "Utilizando Diccionarios" $ do
+  describe "Diccionario" $ do
     it "[Ej. 1] Puede decidirse si un diccionario tiene cierta clave" $ do
       -- n := tamaño del diccionario
       -- n = 0, versión prefija
@@ -152,7 +152,7 @@ main = hspec $ do
       -- n > 1, m_i > 1 para algún i
       reducerProcess reducer [("a", [1..3]), ("b", [4..6]), ("c", [7..9])] `shouldBe` [6, 15, 24, 48]
 
-  describe "Utilizando Map Reduce" $ do
+  describe "MapReduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
       visitasPorMonumento ["m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
 
