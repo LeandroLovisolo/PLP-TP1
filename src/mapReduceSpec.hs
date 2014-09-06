@@ -154,24 +154,11 @@ main = hspec $ do
 
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
-      visitasPorMonumento [ "m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
+      visitasPorMonumento ["m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
 
     it "monumentosTop devuelve los más visitados en algún orden" $ do 
-      monumentosTop [ "m1", "m0", "m0", "m0", "m2", "m2", "m3"] 
-      `shouldSatisfy` (\res -> res == ["m0", "m2", "m3", "m1"] || res == ["m0", "m2", "m1", "m3"])
-    it "Distribution process distribuye correctamente los trabajos" $ do
-      distributionProcess 4 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1,5,9],[2,6,10],[3,7],[4,8]]
-      distributionProcess 1 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1,2,3,4,5,6,7,8,9,10]]
-      distributionProcess 10 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]]
-      distributionProcess 12 [1,2,3,4,5,6,7,8,9,10] `shouldMatchList` [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[],[]]
-    it "Mapper process funciona correctamente" $do
-      (mapperProcess (\x -> if (mod x 2) == 0 then [("esPar",x)] else [("esImpar",x)]) [1,2,3,4,5,6]) 
-        `shouldMatchList` [("esPar",[2,4,6]),("esImpar",[1,3,5])]
-      (mapperProcess (\x -> if (mod x 2) == 0 then [("esPar",x)] else [("esImpar",x)]) []) 
-        `shouldMatchList` []
-    it "Reducer process reduce correctamente" $do
-      reducerProcess (\x -> if (fst x) == "esPar" then [length (snd x)] else []) [("esPar",[2,4,6]),("esImpar",[1,3,5])] `shouldMatchList` [3]
-      reducerProcess (\x -> if (fst x) == "esPar" then [length (snd x)] else []) [("esImpar",[1,3,5])] `shouldMatchList` []
+      monumentosTop ["m1", "m0", "m0", "m0", "m2", "m2", "m3"] `shouldBeOneOf` [["m0", "m2", "m3", "m1"],
+                                                                                ["m0", "m2", "m1", "m3"]]
 
 -- Función auxiliar para testear distributionProcess (ejercicio 6)
 correctlyDistributed :: Eq a => Int -> [a] -> [[a]] -> Bool
