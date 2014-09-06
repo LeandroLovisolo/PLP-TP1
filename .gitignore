@@ -1,10 +1,15 @@
+# Binaries
+tests
+informe.pdf
+
 # Haskell
 *.o
 *.hi
 
-# Binaries
-testTP1
-tests
+# LaTeX
+*.out
+*.log
+*.aux
 
 # Sublime Text
 *.sublime-project
