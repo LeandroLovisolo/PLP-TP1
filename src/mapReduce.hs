@@ -96,8 +96,13 @@ monumentosTop = (mapReduce mapper reducer) . visitasPorMonumento
 
 -- Ejercicio 13 
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
-monumentosPorPais = undefined
+monumentosPorPais = mapReduce mapper reducer
+  where mapper (Monument, d) = [(get "country" d, 1)]
+        mapper _ = []
+        reducer (k, vs) = [(k, sum vs)]
 
+-- *MapReduce> monumentosPorPais items
+-- [("Argentina",2),("Irak",1)]
 
 -- ------------------------ Ejemplo de datos del ejercicio 13 ----------------------
 data Structure = Street | City | Monument deriving Show
