@@ -62,7 +62,7 @@ main = hspec $ do
       -- Caso base
       groupByKey ([] :: [(String, Int)])        `shouldMatchList` []
       -- Caso n = 1
-      groupByKey [("a", 1)]                     `shouldBe` [("a", [1])]
+      groupByKey [("a", 1)]                     `shouldBe`        [("a", [1])]
       -- Caso n > 1, sin claves repetidas
       groupByKey [("a", 1), ("b", 2)]           `shouldMatchList` [("a", [1]), ("b", [2])]
       -- Caso n > 1, con claves repetidas
