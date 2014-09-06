@@ -3,6 +3,7 @@
 -- http://hackage.haskell.org/package/hspec-expectations-0.6.1/docs/Test-Hspec-Expectations.html#t:Expectation
 
 import Test.Hspec
+import Data.List
 import MapReduce
 
 main :: IO ()
@@ -88,6 +89,21 @@ main = hspec $ do
       -- m > 1, n > 1, con claves repetidas
       unionWith (+) [("a", 1), ("b", 2)] [("a", 3), ("c", 4)] `shouldMatchList` [("a", 4), ("b", 2), ("c", 4)]
 
+    it "[Ej. 6] Se puede distribuir una lista de manera balanceada" $ do
+      -- m = tamaño de la lista original, n = cantidad de maquinas
+      -- m = 0, n = 1
+      let n = 1; xs = ([] :: [Int]) in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
+      -- m = 1, n = 1
+      let n = 1; xs = [1]           in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
+      -- m > n, n = 1
+      let n = 1; xs = [1..10]       in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
+      -- m > n, n > 1, m divisible por n
+      let n = 2; xs = [1..10]       in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
+      -- m > n, n > 1, m no divisible por n
+      let n = 3; xs = [1..10]       in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
+      -- 1 < m < n, n > 1
+      let n = 11; xs = [1..10]      in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
+
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
       visitasPorMonumento [ "m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
@@ -108,3 +124,10 @@ main = hspec $ do
     it "Reducer process reduce correctamente" $do
       reducerProcess (\x -> if (fst x) == "esPar" then [length (snd x)] else []) [("esPar",[2,4,6]),("esImpar",[1,3,5])] `shouldMatchList` [3]
       reducerProcess (\x -> if (fst x) == "esPar" then [length (snd x)] else []) [("esImpar",[1,3,5])] `shouldMatchList` []
+
+
+correctlyDistributed :: Eq a => Int -> [a] -> [[a]] -> Bool
+correctlyDistributed n xs res = sameItems && correctlyPartitioned
+  where sameItems             = null (xs \\ concat res) && null ((concat res) \\ xs)
+        correctlyPartitioned  = sort (map length res) == sort correctPartitionSizes
+        correctPartitionSizes = [length xs `div` n + (if x < length xs `mod` n then 1 else 0) | x <- [0..n-1]]
