@@ -27,11 +27,18 @@ main = hspec $ do
       [("b", 1), ("c", 2)] ? "a"       `shouldBe` False
       [("a", 1), ("b", 2)] ? "a"       `shouldBe` True
 
-    it "puede obtenerse el valor correspondiente a una determinada clave" $ do
-      get "k" [("k", "valor")]                    `shouldBe` "valor"
-      [(1, [1, 2, 3]), (2, [1, 2]), (3, [])] ! 1  `shouldBe` [1, 2, 3]
-      [(9000, "A"), (2, "B"), (0, "C")] ! 2       `shouldBe` "B"
-      [(1, "valor1"), (0, "valor2"), (42, "valor3"), (3, "valor4")] ! 3 `shouldBe` "valor4"
+    it "[Ej. 2] Puede extraerse una definición en un diccionario dada su clave" $ do
+      -- Caso n = 1
+      get "a" [("a", 1)]               `shouldBe` 1
+      -- Caso n > 1
+      get "a" [("a", 1), ("b", 2)]     `shouldBe` 1
+      get "b" [("a", 1), ("b", 2)]     `shouldBe` 2
+
+      -- Caso n = 1
+      [("a", 1)] ! "a"                 `shouldBe` 1
+      -- Caso n > 1
+      [("a", 1), ("b", 2)] ! "a"       `shouldBe` 1
+      [("a", 1), ("b", 2)] ! "b"       `shouldBe` 2
 
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
