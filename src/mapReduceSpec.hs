@@ -29,16 +29,30 @@ main = hspec $ do
 
     it "[Ej. 2] Puede extraerse una definición en un diccionario dada su clave" $ do
       -- Caso n = 1
-      get "a" [("a", 1)]               `shouldBe` 1
+      get "a" [("a", 1)]           `shouldBe` 1
       -- Caso n > 1
-      get "a" [("a", 1), ("b", 2)]     `shouldBe` 1
-      get "b" [("a", 1), ("b", 2)]     `shouldBe` 2
+      get "a" [("a", 1), ("b", 2)] `shouldBe` 1
+      get "b" [("a", 1), ("b", 2)] `shouldBe` 2
 
       -- Caso n = 1
-      [("a", 1)] ! "a"                 `shouldBe` 1
+      [("a", 1)] ! "a"             `shouldBe` 1
       -- Caso n > 1
-      [("a", 1), ("b", 2)] ! "a"       `shouldBe` 1
-      [("a", 1), ("b", 2)] ! "b"       `shouldBe` 2
+      [("a", 1), ("b", 2)] ! "a"   `shouldBe` 1
+      [("a", 1), ("b", 2)] ! "b"   `shouldBe` 2
+
+    it "[Ej. 3] Puede reemplazarse una definición en un diccionario dada su clave" $ do
+      -- Caso base
+      insertWith (++) "a" [1] []           `shouldBe`        [("a", [1])]
+      -- Caso n = 1, clave inexistente
+      insertWith (++) "a" [1] [("b", [2])] `shouldMatchList` [("a", [1]), ("b", [2])]
+      -- Caso n = 1, clave existente
+      insertWith (++) "a" [2] [("a", [1])] `shouldBe`        [("a", [1, 2])]
+      -- Caso n > 1, clave inexistente
+      insertWith (++) "a" [1] [("b", [2]), ("c", [3])]
+        `shouldMatchList` [("a", [1]), ("b", [2]), ("c", [3])]
+      -- Caso n > 1, clave existente
+      insertWith (++) "a" [10] [("a", [1]), ("b", [2])]
+        `shouldMatchList` [("a", [1, 10]), ("b", [2])]
 
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
