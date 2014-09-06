@@ -46,17 +46,15 @@ main = hspec $ do
 
     it "[Ej. 3] Puede reemplazarse una definición en un diccionario dada su clave" $ do
       -- Caso base
-      insertWith (++) "a" [1] []           `shouldBe`        [("a", [1])]
+      insertWith (++) "a" [1] []                        `shouldBe`        [("a", [1])]
       -- Caso n = 1, clave inexistente
-      insertWith (++) "a" [1] [("b", [2])] `shouldMatchList` [("a", [1]), ("b", [2])]
+      insertWith (++) "a" [1] [("b", [2])]              `shouldMatchList` [("a", [1]), ("b", [2])]
       -- Caso n = 1, clave existente
-      insertWith (++) "a" [2] [("a", [1])] `shouldBe`        [("a", [1, 2])]
+      insertWith (++) "a" [2] [("a", [1])]              `shouldBe`        [("a", [1, 2])]
       -- Caso n > 1, clave inexistente
-      insertWith (++) "a" [1] [("b", [2]), ("c", [3])]
-        `shouldMatchList` [("a", [1]), ("b", [2]), ("c", [3])]
+      insertWith (++) "a" [1] [("b", [2]), ("c", [3])]  `shouldMatchList` [("a", [1]), ("b", [2]), ("c", [3])]
       -- Caso n > 1, clave existente
-      insertWith (++) "a" [10] [("a", [1]), ("b", [2])]
-        `shouldMatchList` [("a", [1, 10]), ("b", [2])]
+      insertWith (++) "a" [10] [("a", [1]), ("b", [2])] `shouldMatchList` [("a", [1, 10]), ("b", [2])]
 
     it "[Ej. 4] Puede agruparse una lista de tuplas (k, v) como diccionario Dict k [v]" $ do
       -- Caso base
@@ -67,6 +65,28 @@ main = hspec $ do
       groupByKey [("a", 1), ("b", 2)]           `shouldMatchList` [("a", [1]), ("b", [2])]
       -- Caso n > 1, con claves repetidas
       groupByKey [("a", 1), ("a", 2), ("b", 3)] `shouldMatchList` [("a", [1, 2]), ("b", [3])]
+
+    it "[Ej. 5] Pueden unirse diccionarios agrupando por clave en caso de conflicto" $ do
+      -- Casos base
+      unionWith (+) [] []                                     `shouldBe`        ([] :: [(String, Int)])
+      unionWith (+) [("a", 1)] []                             `shouldBe`        [("a", 1)]
+      unionWith (+) [] [("a", 1)]                             `shouldBe`        [("a", 1)]
+      -- m = n = 1, sin claves repetidas
+      unionWith (+) [("a", 1)] [("b", 2)]                     `shouldMatchList` [("a", 1), ("b", 2)]
+      -- m = n = 1, con claves repetidas
+      unionWith (+) [("a", 1)] [("a", 2)]                     `shouldBe`        [("a", 3)]
+      -- m > 1, n = 1, sin claves repetidas
+      unionWith (+) [("a", 1), ("b", 2)] [("c", 3)]           `shouldMatchList` [("a", 1), ("b", 2), ("c", 3)]
+      -- m > 1, n = 1, con claves repetidas
+      unionWith (+) [("a", 1), ("b", 2)] [("a", 3)]           `shouldMatchList` [("a", 4), ("b", 2)]
+      -- m = 1, n > 1, sin claves repetidas
+      unionWith (+) [("a", 1)] [("b", 2), ("c", 3)]           `shouldMatchList` [("a", 1), ("b", 2), ("c", 3)]
+      -- m = 1, n > 1, con claves repetidas
+      unionWith (+) [("a", 1)] [("a", 2), ("b", 3)]           `shouldMatchList` [("a", 3), ("b", 3)]
+      -- m > 1, n > 1, sin claves repetidas
+      unionWith (+) [("a", 1), ("b", 2)] [("c", 3), ("d", 4)] `shouldMatchList` [("a", 1), ("b", 2), ("c", 3), ("d", 4)]
+      -- m > 1, n > 1, con claves repetidas
+      unionWith (+) [("a", 1), ("b", 2)] [("a", 3), ("c", 4)] `shouldMatchList` [("a", 4), ("b", 2), ("c", 4)]
 
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
