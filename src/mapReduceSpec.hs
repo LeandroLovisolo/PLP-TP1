@@ -1,5 +1,5 @@
--- Para correr los tests deben cargar en hugs el módulo Tests y evaluar la
--- expresión "main". Algunas funciones que pueden utilizar para chequear resultados:
+-- Para correr los tests deben cargar en hugs el módulo Tests y evaluar la expresión "main".
+-- Algunas funciones que pueden utilizar para chequear resultados:
 -- http://hackage.haskell.org/package/hspec-expectations-0.6.1/docs/Test-Hspec-Expectations.html#t:Expectation
 
 import Test.Hspec
