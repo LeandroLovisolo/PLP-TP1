@@ -3,6 +3,7 @@
 -- http://hackage.haskell.org/package/hspec-expectations-0.6.1/docs/Test-Hspec-Expectations.html#t:Expectation
 
 import Test.Hspec
+import Test.HUnit (assertBool)
 import Data.List
 import MapReduce
 
@@ -59,13 +60,14 @@ main = hspec $ do
 
     it "[Ej. 4] Puede agruparse una lista de tuplas (k, v) como diccionario Dict k [v]" $ do
       -- Caso base
-      groupByKey ([] :: [(String, Int)])        `shouldMatchList` []
+      groupByKey ([] :: [(String, Int)])        `shouldMatchList`  []
       -- Caso n = 1
-      groupByKey [("a", 1)]                     `shouldBe`        [("a", [1])]
+      groupByKey [("a", 1)]                     `shouldBe`         [("a", [1])]
       -- Caso n > 1, sin claves repetidas
-      groupByKey [("a", 1), ("b", 2)]           `shouldMatchList` [("a", [1]), ("b", [2])]
+      groupByKey [("a", 1), ("b", 2)]           `shouldMatchList`  [("a", [1]), ("b", [2])]
       -- Caso n > 1, con claves repetidas
-      groupByKey [("a", 1), ("a", 2), ("b", 3)] `shouldMatchList` [("a", [1, 2]), ("b", [3])]
+      groupByKey [("a", 1), ("a", 2), ("b", 3)] `shouldMatchOneOf` [[("a", [1, 2]), ("b", [3])],
+                                                                    [("a", [2, 1]), ("b", [3])]]
 
     it "[Ej. 5] Pueden unirse diccionarios agrupando por clave en caso de conflicto" $ do
       -- Casos base
@@ -116,6 +118,25 @@ main = hspec $ do
       -- n > 1, múltiples pares (clave, definición) por item
       mapperProcess mapper [1..5]    `shouldMatchList` [("a", [1, 1, 1, 1, 1]), ("b", [1, 1])]
 
+    it "[Ej. 8] Se pueden agrupar y ordenar por clave las salidas de varios mappers" $ do
+      -- n = número de mappers usados, m_i = longitud de la salida del i-ésimo mapper
+      -- Caso base
+      combinerProcess []                                         `shouldBe`      ([] :: [(String, [Int])])
+      -- n = 1, m_1 = 1
+      combinerProcess [[("a", [1])]]                             `shouldBe`      [("a", [1])]
+      -- n = 1, m_1 = 2
+      combinerProcess [[("b", [2]), ("a", [1])]]                 `shouldBe`      [("a", [1]), ("b", [2])]
+      -- n > 1, m_i = 1 para todo i, sin claves repetidas
+      combinerProcess [[("b", [2])], [("a", [1])]]               `shouldBe`      [("a", [1]), ("b", [2])]
+      -- n > 1, m_i = 1 para todo i, con claves repetidas
+      combinerProcess [[("b", [3])], [("a", [1])], [("a", [2])]] `shouldBeOneOf` [[("a", [1, 2]), ("b", [3])],
+                                                                                  [("a", [2, 1]), ("b", [3])]]
+      -- n > 1, m_i > 1 para algún i, sin claves repetidas
+      combinerProcess [[("c", [3]), ("b", [2])], [("a", [1])]]   `shouldBe`      [("a", [1]), ("b", [2]), ("c", [3])]
+      -- n > 1, m_i > 1 para algún i, con claves repetidas
+      combinerProcess [[("b", [3]), ("a", [1])], [("a", [2])]]   `shouldBeOneOf` [[("a", [1, 2]), ("b", [3])],
+                                                                                  [("a", [2, 1]), ("b", [3])]]
+
   describe "Utilizando Map Reduce" $ do
     it "visitas por monumento funciona en algún orden" $ do
       visitasPorMonumento [ "m1" ,"m2" ,"m3" ,"m2","m1", "m3", "m3"] `shouldMatchList` [("m3",3), ("m1",2), ("m2",2)] 
@@ -139,12 +160,23 @@ main = hspec $ do
 
 -- Función auxiliar para testear distributionProcess (ejercicio 6)
 correctlyDistributed :: Eq a => Int -> [a] -> [[a]] -> Bool
-correctlyDistributed n xs res = sameItems && correctlyPartitioned
-  where sameItems             = null (xs \\ concat res) && null ((concat res) \\ xs)
-        correctlyPartitioned  = sort (map length res) == sort correctPartitionSizes
+correctlyDistributed n xs res = sameItems xs (concat res) && correctlyPartitioned
+  where correctlyPartitioned  = sort (map length res) == sort correctPartitionSizes
         correctPartitionSizes = [length xs `div` n + (if x < length xs `mod` n then 1 else 0) | x <- [0..n-1]]
 
 -- Mapper auxiliar para testear mapperProcess (ejercicio 7)
 mapper :: Mapper Int String Int
 mapper x | x `mod` 2 == 0 = [("a", 1), ("b", 1)]
          | otherwise      = [("a", 1)]
+
+-- Devuelve true si y sólo si ambas listas tienen los mismos elementos
+sameItems :: Eq a => [a] -> [a] -> Bool
+sameItems xs ys = null (xs \\ ys) && null (ys \\ xs)
+
+-- Verifica que el valor esté incluido en una lista de posibles valores
+shouldBeOneOf :: (Show a, Eq a) => a -> [a] -> Expectation
+actual `shouldBeOneOf` xs = assertBool ("predicate failed on: " ++ show actual) $ actual `elem` xs
+
+-- Verifica que la lista tenga los mismos elementos que algunas de las listas provistas
+shouldMatchOneOf :: (Show a, Eq a) => [a] -> [[a]] -> Expectation
+x `shouldMatchOneOf` ys = assertBool ("predicate failed on: " ++ show x) $ any (sameItems x) ys
