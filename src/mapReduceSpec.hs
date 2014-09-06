@@ -125,7 +125,7 @@ main = hspec $ do
       reducerProcess (\x -> if (fst x) == "esPar" then [length (snd x)] else []) [("esPar",[2,4,6]),("esImpar",[1,3,5])] `shouldMatchList` [3]
       reducerProcess (\x -> if (fst x) == "esPar" then [length (snd x)] else []) [("esImpar",[1,3,5])] `shouldMatchList` []
 
-
+-- Función auxiliar para testear distributionProcess (ejercicio 6)
 correctlyDistributed :: Eq a => Int -> [a] -> [[a]] -> Bool
 correctlyDistributed n xs res = sameItems && correctlyPartitioned
   where sameItems             = null (xs \\ concat res) && null ((concat res) \\ xs)
