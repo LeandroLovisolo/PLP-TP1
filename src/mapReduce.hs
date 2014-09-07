@@ -2,6 +2,7 @@ module MapReduce where
 
 import Data.Ord
 import Data.List
+import Data.Function (on)
 
 -- ---------------------------------Sección 1---------Diccionario ---------------------------
 type Dict k v = [(k,v)]
@@ -70,8 +71,8 @@ mapperProcess f xs = (groupByKey . concat . map f) xs
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
-combinerProcess lst = sortBy (\x y -> if (fst x) >= (fst y) then GT else LT) (foldr (\x rec -> unionWith (++) x rec) [] lst)
--- Necesita testing, unionWith no implementada todavía
+combinerProcess = sortByKey . (foldr (unionWith (++)) [])
+  where sortByKey = sortBy (compare `on` fst)
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
