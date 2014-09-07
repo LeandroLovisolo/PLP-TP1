@@ -213,18 +213,23 @@ monumentosTop = mapReduce mapper reducer . visitasPorMonumento
   where mapper (k, v) = [(-v, k)]
         reducer (k, vs) = vs 
 
-
 -- Ejercicio 13 
-data Structure = Street | City | Monument deriving Show
-
+-- Dada una lista de estructuras, cada una acompañada de un diccionario que
+-- define sus atributos, entre ellos su país, determinar cuántos monumentos
+-- existen en cada país. Utiliza la técnica MapReduce, mappeando cada estructura
+-- a una tupla (país, 1) y luego sumando las definiciones de todas las tuplas con
+-- misma clave en el paso de reducción.
+--
+-- Ejemplo:
+-- *MapReduce> monumentosPorPais items
+-- [("Argentina",2),("Irak",1)]
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
 monumentosPorPais = mapReduce mapper reducer
   where mapper (Monument, d) = [(d ! "country", 1)]
         mapper _ = []
         reducer (k, vs) = [(k, sum vs)]
 
--- *MapReduce> monumentosPorPais items
--- [("Argentina",2),("Irak",1)]
+data Structure = Street | City | Monument deriving Show
 
 -- Ejercicio 13: entrada de ejemplo
 items :: [(Structure, Dict String String)]
