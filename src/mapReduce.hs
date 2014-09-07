@@ -101,7 +101,7 @@ groupByKey = foldl (\d (k, v) -> insertWith (++) k [v] d) []
 -- *MapReduce> unionWith (++) [("a", [1]), ("b", [2])] [("a", [3]), ("c", [4])]
 -- [("a",[1,3]),("b",[2]),("c",[4])]
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
-unionWith f = foldl (flip (uncurry (insertWith f)))
+unionWith f = foldl . flip . uncurry . insertWith $ f
 
 -------------------------------------------------------------------------------
 -- MapReduce                                                                 --
@@ -122,8 +122,7 @@ type Reducer k v b = (k, [v]) -> [b]
 -- [[1,6,11],[2,7,12],[3,8],[4,9],[5,10]]
 distributionProcess :: Int -> [a] -> [[a]]
 distributionProcess n = reverse . foldr addToFirstAndRotate (replicate n [])
-  where addToFirstAndRotate x (y:ys) = rotate ((x:y):ys)
-        rotate (x:xs)                = xs ++ [x]
+  where addToFirstAndRotate x (ys:yss) = yss ++ [(x:ys)]
 
 -- Ejercicio 7
 -- Aplica una función mapper 'f' a los elementos de una lista y agrupa los
