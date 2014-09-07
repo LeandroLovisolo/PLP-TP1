@@ -139,6 +139,15 @@ mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
 mapperProcess f = groupByKey . concat . map f
 
 -- Ejercicio 8
+-- Combina los resultados de varias máquinas, ordenando y agrupando por clave las
+-- tuplas obtenidas. Utiliza el esquema de recursión 'foldr' para unir sucesivamente
+-- las listas de tuplas, concatenando las listas de definiciones con 'unionWith (++)'
+-- en caso de haber claves repetidas. Finalmente ordena por clave la lista de tuplas
+-- obtenida.
+--
+-- Ejemplo:
+-- *MapReduce> combinerProcess [[("a", [1])], [("a", [2]), ("b", [3])]]  
+-- [("a",[1,2]),("b",[3])]
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
 combinerProcess = sortBy (comparing fst) . foldr (unionWith (++)) []
 
