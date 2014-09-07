@@ -166,21 +166,21 @@ main = hspec $ do
       let idMapper x = [(0, x)]
       let idReducer (k, vs) = vs
       -- n = 0
-      mapReduce idMapper idReducer []     `shouldBe` ([] :: [Int])
+      mapReduce idMapper idReducer []     `shouldBe`        ([] :: [Int])
       -- n = 1
-      mapReduce idMapper idReducer [1]    `shouldBe` [1]
+      mapReduce idMapper idReducer [1]    `shouldBe`        [1]
       -- n > 1
-      mapReduce idMapper idReducer [1..3] `shouldBe` [1..3]
+      mapReduce idMapper idReducer [1..3] `shouldMatchList` [1..3]
  
       -- Duplicar elementos (mapper 1 a muchos, reducer 1 a 1)
       let dupMapper x = [(0, x), (0, x)]
       let dupReducer = idReducer
       -- n = 0
-      mapReduce dupMapper dupReducer []     `shouldBe` ([] :: [Int])
+      mapReduce dupMapper dupReducer []     `shouldBe`        ([] :: [Int])
       -- n = 1
-      mapReduce dupMapper dupReducer [1]    `shouldBe` [1, 1]
+      mapReduce dupMapper dupReducer [1]    `shouldMatchList` [1, 1]
       -- n > 1
-      mapReduce dupMapper dupReducer [1..3] `shouldBe` [1, 1, 2, 2, 3, 3]
+      mapReduce dupMapper dupReducer [1..3] `shouldMatchList` [1, 1, 2, 2, 3, 3]
 
       -- Elevar elementos al cuadrado (mapper 1 a muchos, reducer muchos a 1)
       let squareMapper x = [(x, x) | y <- [1..x]]
