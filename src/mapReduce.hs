@@ -66,8 +66,7 @@ distributionProcess n lst = reverse (foldr (\x rec -> rotate 1 ((x : head (rec))
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
--- mapperProcess f lst = groupByKey (foldr (\x rec -> (f x) ++ rec) [] lst)
-mapperProcess f xs = groupByKey (concat (map f xs))
+mapperProcess f xs = (groupByKey . concat . map f) xs
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
