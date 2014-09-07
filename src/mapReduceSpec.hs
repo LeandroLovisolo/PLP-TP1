@@ -109,6 +109,9 @@ main = hspec $ do
       let n = 11; xs = [1..10]      in distributionProcess n xs `shouldSatisfy` correctlyDistributed n xs
 
     it "[Ej. 7] Se puede aplicar una función mapper a los elementos de una lista" $ do
+      let mapper x | x `mod` 2 == 0 = [("a", 1), ("b", 1)]
+                   | otherwise      = [("a", 1)]
+
       -- n := longitud de la lista
       -- n = 0
       mapperProcess mapper []        `shouldBe` []
@@ -141,6 +144,9 @@ main = hspec $ do
                                                                                   [("a", [2, 1]), ("b", [3])]]
 
     it "[Ej. 9] Se puede reducir el resultado de combinar la salida de varios mappers" $ do
+      let reducer (k, vs) | k == "a" || k == "b" = [sum vs]
+                          | otherwise            = [sum vs, 2 * (sum vs)]
+
       -- n := número de pares a reducir, m_i := longitud de la reducción del i-ésimo par
       -- n = 0
       reducerProcess reducer []                                            `shouldBe` []
@@ -152,6 +158,49 @@ main = hspec $ do
       reducerProcess reducer [("a", [1..3]), ("b", [4..6])]                `shouldBe` [6, 15]
       -- n > 1, m_i > 1 para algún i
       reducerProcess reducer [("a", [1..3]), ("b", [4..6]), ("c", [7..9])] `shouldBe` [6, 15, 24, 48]
+
+    it "[Ej. 10] Se pueden realizar cómputos con la técnica MapReduce" $ do
+      -- n := longitud de la lista de entrada
+
+      -- Función identidad (mapper 1 a 1, reducer 1 a 1)
+      let idMapper x = [(0, x)]
+      let idReducer (k, vs) = vs
+      -- n = 0
+      mapReduce idMapper idReducer []     `shouldBe` ([] :: [Int])
+      -- n = 1
+      mapReduce idMapper idReducer [1]    `shouldBe` [1]
+      -- n > 1
+      mapReduce idMapper idReducer [1..3] `shouldBe` [1..3]
+ 
+      -- Duplicar elementos (mapper 1 a muchos, reducer 1 a 1)
+      let dupMapper x = [(0, x), (0, x)]
+      let dupReducer = idReducer
+      -- n = 0
+      mapReduce dupMapper dupReducer []     `shouldBe` ([] :: [Int])
+      -- n = 1
+      mapReduce dupMapper dupReducer [1]    `shouldBe` [1, 1]
+      -- n > 1
+      mapReduce dupMapper dupReducer [1..3] `shouldBe` [1, 1, 2, 2, 3, 3]
+
+      -- Elevar elementos al cuadrado (mapper 1 a muchos, reducer muchos a 1)
+      let squareMapper x = [(x, x) | y <- [1..x]]
+      let squareReducer (k, vs) = [sum vs]
+      -- n = 0
+      mapReduce squareMapper squareReducer []     `shouldBe` ([] :: [Int])
+      -- n = 1
+      mapReduce squareMapper squareReducer [1]    `shouldBe` [1]
+      -- n > 1
+      mapReduce squareMapper squareReducer [1..3] `shouldBe` [1, 4, 9]
+
+      -- Elevar al cuadrado y agregar sucesor (mapper 1 a muchos, reducer 1 a muchos)
+      let squareAndSuccMapper = squareMapper
+      let squareAndSuccReducer (k, vs) = [sum vs, sum vs + 1]
+      -- n = 0
+      mapReduce squareAndSuccMapper squareAndSuccReducer []     `shouldBe` ([] :: [Int])
+      -- n = 1
+      mapReduce squareAndSuccMapper squareAndSuccReducer [1]    `shouldBe` [1, 2]
+      -- n > 1
+      mapReduce squareAndSuccMapper squareAndSuccReducer [1..3] `shouldBe` [1, 2, 4, 5, 9, 10]
 
   describe "Utilización" $ do
     it "[Ej. 11] visitasPorMonumento computa correctamente el número de visitas de cada monumento" $ do
@@ -166,23 +215,14 @@ main = hspec $ do
 
 -- Función auxiliar para testear distributionProcess (ejercicio 6)
 correctlyDistributed :: Eq a => Int -> [a] -> [[a]] -> Bool
-correctlyDistributed n xs res = sameItems xs (concat res) && correctlyPartitioned
-  where correctlyPartitioned  = sort (map length res) == sort correctPartitionSizes
-        correctPartitionSizes = [length xs `div` n + (if x < length xs `mod` n then 1 else 0) | x <- [0..n-1]]
-
--- Mapper auxiliar para testear mapperProcess (ejercicio 7)
-mapper :: Mapper Int String Int
-mapper x | x `mod` 2 == 0 = [("a", 1), ("b", 1)]
-         | otherwise      = [("a", 1)]
-
--- Reducer auxiliar para testear reducerProcess (ejercicio 9)
-reducer :: Reducer String Int Int
-reducer (k, vs) | k == "a" || k == "b" = [sum vs]
-                | otherwise            = [sum vs, 2 * (sum vs)]
+correctlyDistributed n xs res = xs `hasTheSameElementsAs` (concat res) && correctlyPartitioned
+  where correctlyPartitioned  = sort partitionSizes == sort correctPartitionSizes
+        partitionSizes        = map length res
+        correctPartitionSizes = [length xs `div` n + (if x < length xs `mod` n then 1 else 0) | x <- [0..n - 1]]
 
 -- Devuelve true si y sólo si ambas listas tienen los mismos elementos
-sameItems :: Eq a => [a] -> [a] -> Bool
-sameItems xs ys = null (xs \\ ys) && null (ys \\ xs)
+hasTheSameElementsAs :: Eq a => [a] -> [a] -> Bool
+hasTheSameElementsAs xs ys = null (xs \\ ys) && null (ys \\ xs)
 
 -- Verifica que el valor esté incluido en una lista de posibles valores
 shouldBeOneOf :: (Show a, Eq a) => a -> [a] -> Expectation
@@ -190,4 +230,4 @@ actual `shouldBeOneOf` xs = assertBool ("predicate failed on: " ++ show actual) 
 
 -- Verifica que la lista tenga los mismos elementos que alguna de las listas provistas
 shouldMatchOneOf :: (Show a, Eq a) => [a] -> [[a]] -> Expectation
-x `shouldMatchOneOf` ys = assertBool ("predicate failed on: " ++ show x) $ any (sameItems x) ys
+x `shouldMatchOneOf` ys = assertBool ("predicate failed on: " ++ show x) $ any (hasTheSameElementsAs x) ys
