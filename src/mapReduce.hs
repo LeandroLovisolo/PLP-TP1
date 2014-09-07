@@ -19,7 +19,7 @@ type Dict k v = [(k,v)]
 -- *MapReduce> belongs "a" [("a", 1), ("b", 2)]
 -- True
 belongs :: Eq k => k -> Dict k v -> Bool
-belongs k = any ((== k) . fst)
+belongs k = any $ (== k) . fst
 
 -- Evalúa la función anterior invirtiendo el orden de sus parámetros.
 --
