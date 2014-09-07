@@ -17,7 +17,7 @@ belongs key = any (\x -> (fst x)==key)
 
 -- Ejercicio 2
 get :: Eq k => k -> Dict k v -> v
-get key dict = snd (foldr1 (\e (k,v) -> (if k==key then (k,v) else e)) dict)
+get key dict = snd (foldr1 (\e (k, v) -> (if k == key then (k, v) else e)) dict)
 
 (!) :: Eq k => Dict k v -> k -> v
 (!) = flip get
