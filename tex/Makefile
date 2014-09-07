@@ -2,7 +2,7 @@
 
 all: informe.pdf
 
-informe.pdf: informe.tex
+informe.pdf: informe.tex ../src/mapReduce.hs
 	pdflatex -interaction=nonstopmode -halt-on-error informe.tex && \
 	pdflatex -interaction=nonstopmode -halt-on-error informe.tex
 
