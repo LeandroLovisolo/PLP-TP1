@@ -78,7 +78,7 @@ mapperProcess f xs = (groupByKey . concat . map f) xs
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
 combinerProcess = sortByKey . (foldr (unionWith (++)) [])
-  where sortByKey = sortBy (compare `on` fst)
+  where sortByKey = sortBy (comparing fst)
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
