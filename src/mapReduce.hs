@@ -186,7 +186,7 @@ mapReduce m r = reducerProcess r . combinerProcess . map (mapperProcess m) . dis
 -- Dada una lista de monumentos visitados, computa el número de visitas de cada
 -- monumento. Utiliza la técnica MapReduce, mappeando cada monumento 'm' a una
 -- tupla (m, 1) y luego sumando las definiciones de todas las tuplas con misma
--- clave.
+-- clave en el paso de reducción.
 -- 
 -- Ejemplo:
 -- *MapReduce> visitasPorMonumento ["m1", "m2", "m3", "m2"]
@@ -197,13 +197,22 @@ visitasPorMonumento = mapReduce mapper reducer
         reducer (k, vs) = [(k, sum vs)]
 
 -- Ejercicio 12
+-- Dada una lista de monumentos visitados, devuelve una lista de monumentos
+-- ordenada según la cantidad de visitas de cada monumento. Utiliza la técnica
+-- MapReduce, primero computando el número de visitas de cada monumento con
+-- 'visitasPorMonumento', luego mappeando cada tupla (monumento, visitas) a
+-- (-visitas, monumento) de manera que se ordenen en forma decreciente durante
+-- el paso de combinación, y finalmente descartando el número de visitas en
+-- el paso de reducción.
+--
+-- Ejemplo:
+-- *MapReduce> monumentosTop ["m1", "m2", "m3", "m2", "m3", "m3", "m1", "m4"]
+-- ["m3","m1","m2","m4"]
 monumentosTop :: [String] -> [String]
 monumentosTop = mapReduce mapper reducer . visitasPorMonumento
   where mapper (k, v) = [(-v, k)]
         reducer (k, vs) = vs 
 
--- *MapReduce> monumentosTop ["m1", "m2", "m3", "m2", "m3", "m3", "m1", "m4"]
--- ["m3","m1","m2","m4"]
 
 -- Ejercicio 13 
 data Structure = Street | City | Monument deriving Show
