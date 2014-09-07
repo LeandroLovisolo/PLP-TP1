@@ -88,11 +88,21 @@ groupByKey :: Eq k => [(k,v)] -> Dict k [v]
 groupByKey = reverse . foldl (\d (k, v) -> insertWith (++) k [v] d) []
 
 -- Ejercicio 5
+-- Dados dos diccionarios, devuelve un nuevo diccionario con las tuplas de ambos.
+-- En caso de haber un par de tuplas (k, v) y (k, v') con la misma clave, unifica
+-- las definiciones por medio de una función 'f' recibida por parámetro e inserta
+-- (k, (f v v')) en el diccionario resultante. Utiliza el esquema de recursión
+-- 'foldr' partiendo del primer diccionario como caso base e insertándole en cada
+-- paso tuplas del segundo diccionario, utilizando 'insertWith' con la función 'f'
+-- para unificar definiciones en caso de haber claves repetidas.
+--
+-- Ejemplos:
+-- *MapReduce> unionWith (++) [("a", [1]), ("b", [2])] [("c", [3]), ("d", [4])]
+-- [("c",[3]),("d",[4]),("a",[1]),("b",[2])]
+-- *MapReduce> unionWith (++) [("a", [1]), ("b", [2])] [("a", [3]), ("c", [4])]
+-- [("c",[4]),("a",[1,3]),("b",[2])]
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
 unionWith f = foldr (\(k, v) -> insertWith f k v)
-
---Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
---[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
 
 -------------------------------------------------------------------------------
 -- MapReduce                                                                 --
