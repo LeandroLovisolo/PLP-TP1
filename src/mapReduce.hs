@@ -193,7 +193,7 @@ mapReduce m r = reducerProcess r . combinerProcess . map (mapperProcess m) . dis
 -- [("m1",1),("m2",2),("m3",1)]
 visitasPorMonumento :: [String] -> Dict String Int
 visitasPorMonumento = mapReduce mapper reducer
-  where mapper k = [(k, 1)]
+  where mapper k        = [(k, 1)]
         reducer (k, vs) = [(k, sum vs)]
 
 -- Ejercicio 12
@@ -210,7 +210,7 @@ visitasPorMonumento = mapReduce mapper reducer
 -- ["m3","m1","m2","m4"]
 monumentosTop :: [String] -> [String]
 monumentosTop = mapReduce mapper reducer . visitasPorMonumento
-  where mapper (k, v) = [(-v, k)]
+  where mapper (k, v)   = [(-v, k)]
         reducer (k, vs) = vs 
 
 -- Ejercicio 13 
@@ -226,8 +226,8 @@ monumentosTop = mapReduce mapper reducer . visitasPorMonumento
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
 monumentosPorPais = mapReduce mapper reducer
   where mapper (Monument, d) = [(d ! "country", 1)]
-        mapper _ = []
-        reducer (k, vs) = [(k, sum vs)]
+        mapper _             = []
+        reducer (k, vs)      = [(k, sum vs)]
 
 data Structure = Street | City | Monument deriving Show
 
