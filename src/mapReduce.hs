@@ -11,7 +11,8 @@ type Dict k v = [(k,v)]
 -- cumple con f. Usamos como f una función que devuelve True si la primer
 -- componente es la clave deseada.
 belongs :: Eq k => k -> Dict k v -> Bool
-belongs key = any (\x -> (fst x)==key)
+belongs k = any hasSameKey
+  where hasSameKey (k', v) = k' == k
 
 -- Sólo necesitamos invertir el orden en que recibe los parámetros.
 (?) :: Eq k => Dict k v -> k -> Bool
@@ -24,7 +25,9 @@ belongs key = any (\x -> (fst x)==key)
 -- seguir buscando. Se recorre el diccionario en busca de la clave 'k', y al
 -- encontrarla se devuelve su definición.
 get :: Eq k => k -> Dict k v -> v
-get key dict = snd (foldr1 (\e (k,v) -> (if k==key then (k,v) else e)) dict)
+get k d = snd (foldr1 returnIfSameKey d)
+  where returnIfSameKey rec (k', v) | k' == k   = (k', v)
+                                    | otherwise = rec
 
 -- Nuevamente, invertir el orden de los parámetros es suficiente.
 (!) :: Eq k => Dict k v -> k -> v
@@ -35,9 +38,10 @@ get key dict = snd (foldr1 (\e (k,v) -> (if k==key then (k,v) else e)) dict)
 -- Ejercicio 3
 
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
-insertWith f newK newV dict = if (dict ? newK)
-                            then map (\(k,v) -> (if k==newK then (k,(f v newV)) else (k,v))) dict
-                            else dict++[(newK,newV)]
+insertWith f k v d | d ? k     = map insert d
+                   | otherwise = (k, v):d
+  where insert (k', v') | k' == k    = (k', f v' v)
+                        | otherwise  = (k', v')
 --Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
 --[(1,"lab"),(2,"p")]
 
