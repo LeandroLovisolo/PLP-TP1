@@ -54,26 +54,42 @@ get k = snd . head . filter ((== k) . fst)
 (!) = flip get
 
 -- Ejercicio 3
--- Si 'k' no existe aún en 'd', se lo agrega sin más.
--- En otro caso se agrega el nuevo valor 'v' a la definición de la clave 'k'
--- usando 'f' como función combinadora.
+-- Inserta una tupla (k, v) a un diccionario si éste no contiene una definición
+-- para k. En caso de existir una definición v' para la misma clave, la reemplaza
+-- por el resultado de evaluar a f en v y v'.
+--
+-- Ejemplos:
+-- *MapReduce> insertWith (++) "a" [1] [("b", [2]), ("c", [3])]
+-- [("a",[1]),("b",[2]),("c",[3])]
+-- *MapReduce> insertWith (++) "b" [3] [("a", [1]), ("b", [2])]
+-- [("a",[1]),("b",[2,3])]
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
 insertWith f k v d | d ? k     = map insert d
-                   | otherwise = d ++ [(k, v)]
+                   | otherwise = (k, v):d
   where insert (k', v') | k' == k    = (k', f v' v)
                         | otherwise  = (k', v')
---Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
---[(1,"lab"),(2,"p")]
 
 -- Ejercicio 4
+-- Dada una lista de tuplas (k, v) devuelve un diccionario de tuplas (k, [v])
+-- agrupando en listas las definiciones de las tuplas con misma clave. Utiliza
+-- el esquema 'foldl', partiendo de un diccionario vacío al que en cada paso le
+-- inserta una tupla (k, [v]) utilizando la función 'insertWith', de manera tal
+-- que si dos tuplas con misma clave (k, v) y (k, v') aparecen en ese orden en
+-- la lista original, éstas resultarán en (k, [v, v']) en el diccionario final.
+-- Por último, se revierte el orden del diccionario resultante con 'reverse'
+-- para respetar el orden de la lista original.
+--
+-- Ejemplo:
+-- *MapReduce> groupByKey [("a", 1), ("b", 2)]
+-- [("a",[1]),("b",[2])]
+-- *MapReduce> groupByKey [("a", 1), ("a", 2), ("b", 3)]
+-- [("a",[1,2]),("b",[3])]
 groupByKey :: Eq k => [(k,v)] -> Dict k [v]
-groupByKey xs = foldl insertIntoDict [] xs
-  where insertIntoDict d (k, v) = insertWith (++) k [v] d
+groupByKey = reverse . foldl (\d (k, v) -> insertWith (++) k [v] d) []
 
 -- Ejercicio 5
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
-unionWith f d d' = foldr insertIntoDict d d'
-  where insertIntoDict (k, v) d'' = insertWith f k v d''
+unionWith f = foldr (\(k, v) -> insertWith f k v)
 
 --Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
 --[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
