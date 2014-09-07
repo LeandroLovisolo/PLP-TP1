@@ -19,7 +19,7 @@ Lautaro José Petaccio (LU 443/11) [lausuper@gmail.com](mailto:lausuper@gmail.co
 Instrucciones
 -------------
 
-Instalar las librerias Haskell `HUnit` y `HSpec` antes de compilar el proyecto:
+Instalar las librerías Haskell `HUnit` y `HSpec` antes de compilar el proyecto:
 
 ```
 cabal update
