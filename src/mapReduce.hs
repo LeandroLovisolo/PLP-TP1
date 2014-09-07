@@ -127,10 +127,11 @@ distributionProcess n = reverse . foldr addToFirstAndRotate (replicate n [])
         rotate (x:xs)                = xs ++ [x]
 
 -- Ejercicio 7
--- Aplica una función mapper 'f' a los elementos de una lista y agrupa los resultados
--- por clave. Para lograr esto primero aplica 'f' a todos los elementos de la lista
--- original con la función 'map', luego aplana la lista de listas de tuplas resultante
--- con 'concat' y finalmente agrupa por clave aplicando la función 'groupByKey'.
+-- Aplica una función mapper 'f' a los elementos de una lista y agrupa los
+-- resultados por clave. Para lograr esto primero aplica 'f' a todos los
+-- elementos de la lista original con la función 'map', luego aplana la lista
+-- de listas de tuplas resultante con 'concat' y finalmente agrupa por clave
+-- aplicando la función 'groupByKey'.
 --
 -- Ejemplo:
 -- *MapReduce> mapperProcess (\x -> [(if x `mod` 2 == 0 then "par" else "impar", x)]) [1..5]
@@ -139,11 +140,11 @@ mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
 mapperProcess f = groupByKey . concat . map f
 
 -- Ejercicio 8
--- Combina los resultados de varias máquinas, ordenando y agrupando por clave las
--- tuplas obtenidas. Utiliza el esquema de recursión 'foldr' para unir sucesivamente
--- las listas de tuplas, concatenando las listas de definiciones con 'unionWith (++)'
--- en caso de haber claves repetidas. Finalmente ordena por clave la lista de tuplas
--- obtenida.
+-- Combina los resultados de varias máquinas, ordenando y agrupando por clave
+-- las tuplas obtenidas. Utiliza el esquema de recursión 'foldr' para unir
+-- sucesivamente las listas de tuplas, concatenando las listas de definiciones
+-- con 'unionWith (++)' en caso de haber claves repetidas. Finalmente ordena
+-- por clave la lista de tuplas obtenida.
 --
 -- Ejemplo:
 -- *MapReduce> combinerProcess [[("a", [1])], [("a", [2]), ("b", [3])]]  
@@ -152,6 +153,14 @@ combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
 combinerProcess = sortBy (comparing fst) . foldr (unionWith (++)) []
 
 -- Ejercicio 9
+-- Aplica una función reducer 'f' sobre una lista de tuplas y concatena los
+-- resultados obtenidos. Para lograr esto primero aplica 'f' a todos los
+-- elementos de la lista original con la función 'map', luego aplana la lista
+-- resultante con la función 'concat'.
+--
+-- Ejemplo:
+-- *MapReduce> reducerProcess (\(k, vs) -> if k == "a" then vs else [sum vs]) [("a", [1..3]), ("b", [4..6])]
+-- [1,2,3,15]
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
 reducerProcess f = concat . map f
 
