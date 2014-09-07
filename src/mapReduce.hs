@@ -12,7 +12,7 @@ type Dict k v = [(k,v)]
 -- cumple con f. Usamos como f una función que devuelve True si la primer
 -- componente es la clave deseada.
 belongs :: Eq k => k -> Dict k v -> Bool
-belongs k = any (\(k', v) -> k' == k)
+belongs k = any ((== k) . fst)
 
 -- Sólo necesitamos invertir el orden en que recibe los parámetros.
 (?) :: Eq k => Dict k v -> k -> Bool
@@ -25,9 +25,7 @@ belongs k = any (\(k', v) -> k' == k)
 -- Se recorre el diccionario en busca de la clave 'k', y al encontrarla se
 -- devuelve su definición.
 get :: Eq k => k -> Dict k v -> v
-get k d = snd (foldr1 returnIfSameKey d)
-  where returnIfSameKey rec (k', v) | k' == k   = (k', v)
-                                    | otherwise = rec
+get k = snd . head . filter ((== k) . fst)
 
 -- Nuevamente, invertir el orden de los parámetros es suficiente.
 (!) :: Eq k => Dict k v -> k -> v
