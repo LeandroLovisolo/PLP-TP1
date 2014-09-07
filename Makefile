@@ -1,6 +1,6 @@
 BUNDLE       = PLP-TP1.tar.gz
 BUNDLE_DIR   = PLP-TP1
-BUNDLE_FILES = src tex Makefile README.md enunciado.pdf
+BUNDLE_FILES = src tex Makefile README.md enunciado.pdf informe.pdf
 
 .PHONY: all clean bundle
 
@@ -14,7 +14,6 @@ informe.pdf:
 bundle: clean informe.pdf
 	mkdir $(BUNDLE_DIR)
 	cp $(BUNDLE_FILES) $(BUNDLE_DIR) -r
-	cp informe.pdf $(BUNDLE_DIR)
 	tar zcf $(BUNDLE) $(BUNDLE_DIR)
 	rm -rf $(BUNDLE_DIR)
 
