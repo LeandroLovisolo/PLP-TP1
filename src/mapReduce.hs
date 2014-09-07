@@ -4,34 +4,54 @@ import Data.Ord
 import Data.List
 import Data.Function (on)
 
--- ---------------------------------Sección 1---------Diccionario ---------------------------
+-------------------------------------------------------------------------------
+-- Diccionario                                                               --
+-------------------------------------------------------------------------------
+
 type Dict k v = [(k,v)]
 
 -- Ejercicio 1
--- 'any f xs' devuelve True si alguno de los elementos de la lista xs
--- cumple con f. Usamos como f una función que devuelve True si la primer
--- componente es la clave deseada.
+-- Verifica si un diccionario contiene una definición para una clave dada.
+-- La función 'any' toma un predicado y una lista, y devuelve True si algún
+-- elemento en la lista satisface el predicado. El predicado utilizado toma
+-- una tupla y se satisface si la clave de la tupla coincide con la recibida.
+--
+-- Ejemplo:
+-- *MapReduce> belongs "a" [("a", 1), ("b", 2)]
+-- True
 belongs :: Eq k => k -> Dict k v -> Bool
 belongs k = any ((== k) . fst)
 
--- Sólo necesitamos invertir el orden en que recibe los parámetros.
+-- Evalúa la función anterior invirtiendo el orden de sus parámetros.
+--
+-- Ejemplo:
+-- *MapReduce> [("a", 1), ("b", 2)] ? "a"
+-- True
 (?) :: Eq k => Dict k v -> k -> Bool
 (?) = flip belongs
---Main> [("calle",[3]),("city",[2,1])] ? "city" 
---True
 
 -- Ejercicio 2
--- returnIfSameKey decide si la tupla es la indicada o hay que seguir buscando.
--- Se recorre el diccionario en busca de la clave 'k', y al encontrarla se
--- devuelve su definición.
+-- Devuelve la definición asociada a una clave dada (asumiendo que está presente.)
+-- La función 'filter' devuelve todos los elementos de una lista que satisfacen un
+-- predicado dado. El predicado utilizado toma una tupla y se satisface si la
+-- clave de la tupla coincide con la clave recibida. Luego la función 'head' extrae
+-- el primer elemento de la lista resultante (que debería ser único ya que no
+-- deberían haber claves repetidas) y finalmente 'snd' devuelve la definición de
+-- esa tupla. 
+--
+-- Ejemplo:
+-- *MapReduce> get "a" [("a", 1), ("b", 2)]
+-- 1
 get :: Eq k => k -> Dict k v -> v
 get k = snd . head . filter ((== k) . fst)
 
--- Nuevamente, invertir el orden de los parámetros es suficiente.
+-- Evalúa la función anterior invirtiendo el orden de sus parámetros.
+--
+-- Ejemplo:
+-- *MapReduce> [("a", 1), ("b", 2)] ! "a"
+-- 1
 (!) :: Eq k => Dict k v -> k -> v
 (!) = flip get
---Main> [("calle",[3]),("city",[2,1])] ! "city" 
---[2,1]
 
 -- Ejercicio 3
 -- Si 'k' no existe aún en 'd', se lo agrega sin más.
@@ -58,7 +78,9 @@ unionWith f d d' = foldr insertIntoDict d d'
 --Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
 --[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
 
--- ------------------------------Sección 2--------------MapReduce---------------------------
+-------------------------------------------------------------------------------
+-- MapReduce                                                                 --
+-------------------------------------------------------------------------------
 
 type Mapper a k v = a -> [(k,v)]
 type Reducer k v b = (k, [v]) -> [b]
@@ -85,6 +107,10 @@ reducerProcess f = concat . map f
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
 mapReduce m r = reducerProcess r . combinerProcess . map (mapperProcess m) . distributionProcess 100
 
+-------------------------------------------------------------------------------
+-- Utilización                                                               --
+-------------------------------------------------------------------------------
+
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
 visitasPorMonumento = mapReduce mapper reducer
@@ -104,6 +130,8 @@ monumentosTop = mapReduce mapper reducer . visitasPorMonumento
 -- ["m3","m1","m2","m4"]
 
 -- Ejercicio 13 
+data Structure = Street | City | Monument deriving Show
+
 monumentosPorPais :: [(Structure, Dict String String)] -> [(String, Int)]
 monumentosPorPais = mapReduce mapper reducer
   where mapper (Monument, d) = [(d ! "country", 1)]
@@ -113,9 +141,7 @@ monumentosPorPais = mapReduce mapper reducer
 -- *MapReduce> monumentosPorPais items
 -- [("Argentina",2),("Irak",1)]
 
--- ------------------------ Ejemplo de datos del ejercicio 13 ----------------------
-data Structure = Street | City | Monument deriving Show
-
+-- Ejercicio 13: entrada de ejemplo
 items :: [(Structure, Dict String String)]
 items = [
     (Monument, [
@@ -140,7 +166,3 @@ items = [
       ("new_field", "new"),
       ("latlong", "-11.6033,-12.3817")])
     ]
-
-
-------------------------------------------------
-------------------------------------------------
