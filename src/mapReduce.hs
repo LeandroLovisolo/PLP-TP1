@@ -8,29 +8,40 @@ import Data.Function (on)
 type Dict k v = [(k,v)]
 
 -- Ejercicio 1
+-- 'any f xs' devuelve True si alguno de los elementos de la lista xs
+-- cumple con f. Usamos como f una función que devuelve True si la primer
+-- componente es la clave deseada.
 belongs :: Eq k => k -> Dict k v -> Bool
 belongs k = any (\(k', v) -> k' == k)
 
+-- Sólo necesitamos invertir el orden en que recibe los parámetros.
 (?) :: Eq k => Dict k v -> k -> Bool
 (?) = flip belongs
 --Main> [("calle",[3]),("city",[2,1])] ? "city" 
 --True
 
 -- Ejercicio 2
+-- returnIfSameKey decide si la tupla es la indicada o hay que seguir buscando.
+-- Se recorre el diccionario en busca de la clave 'k', y al encontrarla se
+-- devuelve su definición.
 get :: Eq k => k -> Dict k v -> v
 get k d = snd (foldr1 returnIfSameKey d)
   where returnIfSameKey rec (k', v) | k' == k   = (k', v)
                                     | otherwise = rec
 
+-- Nuevamente, invertir el orden de los parámetros es suficiente.
 (!) :: Eq k => Dict k v -> k -> v
 (!) = flip get
 --Main> [("calle",[3]),("city",[2,1])] ! "city" 
 --[2,1]
 
 -- Ejercicio 3
+-- Si 'k' no existe aún en 'd', se lo agrega sin más.
+-- En otro caso se agrega el nuevo valor 'v' a la definición de la clave 'k'
+-- usando 'f' como función combinadora.
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
 insertWith f k v d | d ? k     = map insert d
-                   | otherwise = (k, v):d
+                   | otherwise = d ++ [(k, v)]
   where insert (k', v') | k' == k    = (k', f v' v)
                         | otherwise  = (k', v')
 --Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
@@ -49,21 +60,16 @@ unionWith f d d' = foldr insertIntoDict d d'
 --Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
 --[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
 
-
 -- ------------------------------Sección 2--------------MapReduce---------------------------
 
 type Mapper a k v = a -> [(k,v)]
 type Reducer k v b = (k, [v]) -> [b]
 
-rotate :: Int -> [a] -> [a]
-rotate _ [] = []
-rotate n xs = zipWith const (drop n (cycle xs)) xs
-
 -- Ejercicio 6
 distributionProcess :: Int -> [a] -> [[a]]
-distributionProcess n lst = reverse (foldr (\x rec -> rotate 1 ((x : head (rec)) : tail(rec))) (replicate n []) lst)
+distributionProcess n lst = reverse (foldr (\x rec -> rotate ((x : head (rec)) : tail(rec))) (replicate n []) lst)
+  where rotate (x:xs) = xs ++ [x]
 -- distributionProcess 3 [1,2,3,4,5,6,7,8,9,10]
-
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
@@ -81,7 +87,6 @@ reducerProcess red = foldr (\x rec -> (red x) ++ rec) []
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
 mapReduce f g lst = reducerProcess g (combinerProcess (map (mapperProcess f) (distributionProcess 100 lst)))
--- Necesita testing!
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
