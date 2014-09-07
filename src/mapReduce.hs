@@ -82,7 +82,7 @@ combinerProcess = sortByKey . (foldr (unionWith (++)) [])
 
 -- Ejercicio 9
 reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
-reducerProcess red = foldr (\x rec -> (red x) ++ rec) []
+reducerProcess f = concat . (map f)
 
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
