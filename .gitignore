@@ -11,6 +11,10 @@ informe.pdf
 *.log
 *.aux
 
+# Bundle
+bundle
+*.tar.gz
+
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
