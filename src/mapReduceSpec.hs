@@ -131,16 +131,16 @@ main = hspec $ do
       -- n = 1, m_1 = 1
       combinerProcess [[("a", [1])]]                             `shouldBe`      [("a", [1])]
       -- n = 1, m_1 = 2
-      combinerProcess [[("b", [2]), ("a", [1])]]                 `shouldBe`      [("a", [1]), ("b", [2])]
+      combinerProcess [[("a", [1]), ("b", [2])]]                 `shouldBe`      [("a", [1]), ("b", [2])]
       -- n > 1, m_i = 1 para todo i, sin claves repetidas
-      combinerProcess [[("b", [2])], [("a", [1])]]               `shouldBe`      [("a", [1]), ("b", [2])]
+      combinerProcess [[("a", [1])], [("b", [2])]]               `shouldBe`      [("a", [1]), ("b", [2])]
       -- n > 1, m_i = 1 para todo i, con claves repetidas
-      combinerProcess [[("b", [3])], [("a", [1])], [("a", [2])]] `shouldBeOneOf` [[("a", [1, 2]), ("b", [3])],
+      combinerProcess [[("a", [1])], [("a", [2])], [("b", [3])]] `shouldBeOneOf` [[("a", [1, 2]), ("b", [3])],
                                                                                   [("a", [2, 1]), ("b", [3])]]
       -- n > 1, m_i > 1 para algún i, sin claves repetidas
-      combinerProcess [[("c", [3]), ("b", [2])], [("a", [1])]]   `shouldBe`      [("a", [1]), ("b", [2]), ("c", [3])]
+      combinerProcess [[("a", [1]), ("b", [2])], [("c", [3])]]   `shouldBe`      [("a", [1]), ("b", [2]), ("c", [3])]
       -- n > 1, m_i > 1 para algún i, con claves repetidas
-      combinerProcess [[("b", [3]), ("a", [1])], [("a", [2])]]   `shouldBeOneOf` [[("a", [1, 2]), ("b", [3])],
+      combinerProcess [[("a", [1])], [("a", [2]), ("b", [3])]]   `shouldBeOneOf` [[("a", [1, 2]), ("b", [3])],
                                                                                   [("a", [2, 1]), ("b", [3])]]
 
     it "[Ej. 9] Se puede reducir el resultado de combinar la salida de varios mappers" $ do
