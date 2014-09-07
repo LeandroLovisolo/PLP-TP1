@@ -47,7 +47,8 @@ insertWith f k v d | d ? k     = map insert d
 
 -- Ejercicio 4
 groupByKey :: Eq k => [(k,v)] -> Dict k [v]
-groupByKey dict = foldl (flip (uncurry (insertWith (++)))) [] (map (\(k,v) -> (k,[v])) dict)
+groupByKey xs = foldl insertIntoDict [] xs
+  where insertIntoDict d (k, v) = insertWith (++) k [v] d
 
 -- Ejercicio 5
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
