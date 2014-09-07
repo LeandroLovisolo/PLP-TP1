@@ -86,7 +86,7 @@ reducerProcess f = concat . (map f)
 
 -- Ejercicio 10
 mapReduce :: (Eq k, Ord k) => Mapper a k v -> Reducer k v b -> [a] -> [b]
-mapReduce f g lst = reducerProcess g (combinerProcess (map (mapperProcess f) (distributionProcess 100 lst)))
+mapReduce m r = reducerProcess r . combinerProcess . map (mapperProcess m) . distributionProcess 100
 
 -- Ejercicio 11
 visitasPorMonumento :: [String] -> Dict String Int
