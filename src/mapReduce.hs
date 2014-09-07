@@ -2,7 +2,6 @@ module MapReduce where
 
 import Data.Ord
 import Data.List
-import Data.Function (on)
 
 -------------------------------------------------------------------------------
 -- Diccionario                                                               --
@@ -59,13 +58,13 @@ get k = snd . head . filter ((== k) . fst)
 -- por el resultado de evaluar a f en v y v'.
 --
 -- Ejemplos:
--- *MapReduce> insertWith (++) "a" [1] [("b", [2]), ("c", [3])]
+-- *MapReduce> insertWith (++) "c" [3] [("a", [1]), ("b", [2])]
 -- [("a",[1]),("b",[2]),("c",[3])]
 -- *MapReduce> insertWith (++) "b" [3] [("a", [1]), ("b", [2])]
 -- [("a",[1]),("b",[2,3])]
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
 insertWith f k v d | d ? k     = map insert d
-                   | otherwise = (k, v):d
+                   | otherwise = d ++ [(k, v)]
   where insert (k', v') | k' == k    = (k', f v' v)
                         | otherwise  = (k', v')
 
@@ -85,7 +84,7 @@ insertWith f k v d | d ? k     = map insert d
 -- *MapReduce> groupByKey [("a", 1), ("a", 2), ("b", 3)]
 -- [("a",[1,2]),("b",[3])]
 groupByKey :: Eq k => [(k,v)] -> Dict k [v]
-groupByKey = reverse . foldl (\d (k, v) -> insertWith (++) k [v] d) []
+groupByKey = foldl (\d (k, v) -> insertWith (++) k [v] d) []
 
 -- Ejercicio 5
 -- Dados dos diccionarios, devuelve un nuevo diccionario con las tuplas de ambos.
@@ -98,11 +97,11 @@ groupByKey = reverse . foldl (\d (k, v) -> insertWith (++) k [v] d) []
 --
 -- Ejemplos:
 -- *MapReduce> unionWith (++) [("a", [1]), ("b", [2])] [("c", [3]), ("d", [4])]
--- [("c",[3]),("d",[4]),("a",[1]),("b",[2])]
+-- [("a",[1]),("b",[2]),("c",[3]),("d",[4])]
 -- *MapReduce> unionWith (++) [("a", [1]), ("b", [2])] [("a", [3]), ("c", [4])]
--- [("c",[4]),("a",[1,3]),("b",[2])]
+-- [("a",[1,3]),("b",[2]),("c",[4])]
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
-unionWith f = foldr (\(k, v) -> insertWith f k v)
+unionWith f = foldl (flip (uncurry (insertWith f)))
 
 -------------------------------------------------------------------------------
 -- MapReduce                                                                 --
