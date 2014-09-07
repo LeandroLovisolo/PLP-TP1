@@ -67,9 +67,9 @@ type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
 distributionProcess :: Int -> [a] -> [[a]]
-distributionProcess n lst = reverse (foldr (\x rec -> rotate ((x : head (rec)) : tail(rec))) (replicate n []) lst)
-  where rotate (x:xs) = xs ++ [x]
--- distributionProcess 3 [1,2,3,4,5,6,7,8,9,10]
+distributionProcess n = reverse . (foldr addToFirstAndRotate (replicate n []))
+  where addToFirstAndRotate x (y:ys) = rotate ((x:y):ys)
+        rotate (x:xs)                = xs ++ [x]
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
