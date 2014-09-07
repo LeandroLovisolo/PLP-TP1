@@ -21,9 +21,9 @@ belongs k = any hasSameKey
 --True
 
 -- Ejercicio 2
--- La función parámetro del foldr1 decide si la tupla es la indicada o hay que
--- seguir buscando. Se recorre el diccionario en busca de la clave 'k', y al
--- encontrarla se devuelve su definición.
+-- returnIfSameKey decide si la tupla es la indicada o hay que seguir buscando.
+-- Se recorre el diccionario en busca de la clave 'k', y al encontrarla se
+-- devuelve su definición.
 get :: Eq k => k -> Dict k v -> v
 get k d = snd (foldr1 returnIfSameKey d)
   where returnIfSameKey rec (k', v) | k' == k   = (k', v)
@@ -36,10 +36,12 @@ get k d = snd (foldr1 returnIfSameKey d)
 --[2,1]
 
 -- Ejercicio 3
-
+-- Si 'k' no existe aún en 'd', se lo agrega sin más.
+-- En otro caso se agrega el nuevo valor 'v' a la definición de la clave 'k'
+-- usando 'f' como función combinadora.
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
 insertWith f k v d | d ? k     = map insert d
-                   | otherwise = (k, v):d
+                   | otherwise = d ++ [(k, v)]
   where insert (k', v') | k' == k    = (k', f v' v)
                         | otherwise  = (k', v')
 --Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
