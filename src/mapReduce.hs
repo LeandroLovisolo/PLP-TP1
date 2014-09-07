@@ -11,8 +11,7 @@ type Dict k v = [(k,v)]
 -- cumple con f. Usamos como f una función que devuelve True si la primer
 -- componente es la clave deseada.
 belongs :: Eq k => k -> Dict k v -> Bool
-belongs k = any hasSameKey
-  where hasSameKey (k', v) = k' == k
+belongs k = any (\(k', v) -> k' == k)
 
 -- Sólo necesitamos invertir el orden en que recibe los parámetros.
 (?) :: Eq k => Dict k v -> k -> Bool
@@ -54,7 +53,9 @@ groupByKey xs = foldl insertIntoDict [] xs
 
 -- Ejercicio 5
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
-unionWith f dict1 = foldr (uncurry (insertWith f)) dict1
+unionWith f d d' = foldr insertIntoDict d d'
+  where insertIntoDict (k, v) d'' = insertWith f k v d''
+
 --Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
 --[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
 
@@ -71,7 +72,7 @@ distributionProcess n lst = reverse (foldr (\x rec -> rotate ((x : head (rec)) :
 
 -- Ejercicio 7
 mapperProcess :: Eq k => Mapper a k v -> [a] -> [(k,[v])]
-mapperProcess f lst = groupByKey (foldr (\x rec -> (f x) ++ rec) [] lst)
+mapperProcess f xs = (groupByKey . concat . map f) xs
 
 -- Ejercicio 8
 combinerProcess :: (Eq k, Ord k) => [[(k, [v])]] -> [(k,[v])]
