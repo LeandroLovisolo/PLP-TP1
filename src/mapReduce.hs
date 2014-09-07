@@ -165,10 +165,10 @@ reducerProcess :: Reducer k v b -> [(k, [v])] -> [b]
 reducerProcess f = concat . map f
 
 -- Ejercicio 10
--- Implementa la técnica MapReduce. Toma una lista de elementos, que los
--- reparte entre 100 procesos con la función 'distributionProcess', luego le
--- aplica 'mapperProcess' con la función mapper 'm' a la lista de cada proceso
--- utilizando la función 'map', combina las listas obtenidas del paso anterior
+-- Implementa la técnica MapReduce. Toma una lista de elementos que reparte
+-- entre 100 procesos con la función 'distributionProcess', luego aplica
+-- la función 'mapperProcess' con la función mapper 'm' a la lista de cada
+-- proceso utilizando 'map', combina las listas obtenidas del paso anterior
 -- con la función 'combinerProcess', y finalmente reduce la lista resultante
 -- aplicándole 'reducerProcess' con la función de reducción 'r'.
 --
