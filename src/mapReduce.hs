@@ -43,8 +43,8 @@ groupByKey xs = foldl insertIntoDict [] xs
 
 -- Ejercicio 5
 unionWith :: Eq k => (v -> v -> v) -> Dict k v -> Dict k v -> Dict k v
-unionWith f d = foldr insertIntoDict d
-  where insertIntoDict (k, v) = insertWith f k v
+unionWith f d d' = foldr insertIntoDict d d'
+  where insertIntoDict (k, v) d'' = insertWith f k v d''
 
 --Main> unionWith (++) [("calle",[3]),("city",[2,1])] [("calle", [4]), ("altura", [1,3,2])]
 --[("calle",[3,4]),("city",[2,1]),("altura",[1,3,2])]
