@@ -112,6 +112,15 @@ type Mapper a k v = a -> [(k,v)]
 type Reducer k v b = (k, [v]) -> [b]
 
 -- Ejercicio 6
+-- Distribuye los elementos de una lista entre 'n' listas de manera balanceada.
+-- Utiliza el esquema de recursión 'foldr' partiendo de 'n' listas vacías. En
+-- cada paso toma la primer lista, le inserta un elemento de la lista original
+-- y rota las 'n' listas antes de continuar. Finalmente revierte el orden de
+-- las 'n' listas para volver a su orden original.
+--
+-- Ejemplo:
+-- *MapReduce> distributionProcess 5 [1..12]
+-- [[1,6,11],[2,7,12],[3,8],[4,9],[5,10]]
 distributionProcess :: Int -> [a] -> [[a]]
 distributionProcess n = reverse . foldr addToFirstAndRotate (replicate n [])
   where addToFirstAndRotate x (y:ys) = rotate ((x:y):ys)
