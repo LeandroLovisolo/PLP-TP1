@@ -8,7 +8,8 @@ type Dict k v = [(k,v)]
 
 -- Ejercicio 1
 belongs :: Eq k => k -> Dict k v -> Bool
-belongs key = any (\x -> (fst x)==key)
+belongs k = any hasSameKey
+  where hasSameKey (k', v) = k' == k
 
 (?) :: Eq k => Dict k v -> k -> Bool
 (?) = flip belongs
@@ -17,7 +18,9 @@ belongs key = any (\x -> (fst x)==key)
 
 -- Ejercicio 2
 get :: Eq k => k -> Dict k v -> v
-get key dict = snd (foldr1 (\e (k, v) -> (if k == key then (k, v) else e)) dict)
+get k d = snd (foldr1 returnIfSameKey d)
+  where returnIfSameKey rec (k', v) | k' == k   = (k', v)
+                                    | otherwise = rec
 
 (!) :: Eq k => Dict k v -> k -> v
 (!) = flip get
@@ -26,9 +29,10 @@ get key dict = snd (foldr1 (\e (k, v) -> (if k == key then (k, v) else e)) dict)
 
 -- Ejercicio 3
 insertWith :: Eq k => (v -> v -> v) -> k -> v -> Dict k v -> Dict k v
-insertWith f key val dict = if (dict ? key)
-                            then map (\(k,v) -> (if k==key then (k,(f v val)) else (k,v))) dict
-                            else dict++[(key,val)]
+insertWith f k v d | d ? k     = map insert d
+                   | otherwise = (k, v):d
+  where insert (k', v') | k' == k    = (k', f v' v)
+                        | otherwise  = (k', v')
 --Main> insertWith (++) 2 ['p'] (insertWith (++) 1 ['a','b'] (insertWith (++) 1 ['l'] []))
 --[(1,"lab"),(2,"p")]
 
