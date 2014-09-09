@@ -9,7 +9,7 @@ all: informe.pdf
 
 informe.pdf:
 	make -C tex all
-	cp tex/informe.pdf .
+	mv tex/informe.pdf .
 
 bundle: clean informe.pdf
 	mkdir $(BUNDLE_DIR)
